@@ -240,9 +240,56 @@
   #waterUndo[disabled]{ opacity:.35; text-decoration:none; }
 
   /* ---------- meal tab ---------- */
-  .activity-card{ padding:12px; }
-  .activity-card .seg button{ padding:11px 4px; font-size:13px; }
-  .activity-card .seg button .em{ margin-right:4px; }
+  /* ---------- 오늘 움직임 (걸음 수 · 운동 → 유지칼로리) ---------- */
+  .move-card{ padding:16px 16px 14px; }
+  .move-block{ margin-top:15px; }
+  .move-label{
+    display:flex; align-items:center; gap:6px; margin:0 0 8px;
+    font-size:12px; font-weight:700; color:var(--ink-soft);
+  }
+  .move-label .em{ font-size:14px; line-height:1; }
+  .num-field{ position:relative; flex:1; min-width:0; }
+  .num-field input{
+    width:100%; border:1px solid rgba(126,155,128,.2); background:#FCFAF4;
+    border-radius:14px; padding:12px 48px 12px 13px; font-family:inherit; font-size:17px;
+    font-weight:600; color:var(--ink); outline:none; font-variant-numeric:tabular-nums;
+    -moz-appearance:textfield;
+  }
+  .num-field input::-webkit-outer-spin-button,
+  .num-field input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  .num-field input::placeholder{ color:#BCC2B4; font-weight:500; font-size:13px; }
+  .num-field input:focus{ border-color:rgba(126,155,128,.5); background:#FFFDF8; }
+  .num-field .suffix{
+    position:absolute; right:13px; top:50%; transform:translateY(-50%);
+    font-size:12px; font-weight:700; color:var(--muted); pointer-events:none;
+  }
+  .quick-chips{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .qchip{
+    border:1px solid rgba(126,155,128,.16); background:#FCFAF4; border-radius:999px;
+    padding:7px 12px; font-family:inherit; font-size:12px; font-weight:600; color:var(--ink-soft);
+    cursor:pointer; font-variant-numeric:tabular-nums;
+    transition:background .16s ease, color .16s ease, border-color .16s ease, transform .12s ease;
+  }
+  .qchip:active{ transform:scale(.96); }
+  .qchip[aria-pressed="true"]{
+    background:var(--sage-deep); color:#FFFDF8; border-color:var(--sage-deep);
+  }
+  .move-hint{ margin:8px 0 0; font-size:11px; color:var(--muted); line-height:1.5; }
+  .ex-seg button{ font-size:11.5px; padding:10px 3px; letter-spacing:-0.02em; }
+  .move-readout{
+    margin-top:17px; padding:14px 15px; border-radius:18px;
+    background:linear-gradient(150deg, #F3F9EF 0%, #FFFDF8 70%);
+    border:1px solid rgba(126,155,128,.22);
+    display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap;
+  }
+  .move-readout .rk-label{ font-size:12px; font-weight:700; color:var(--sage); }
+  .move-readout .rk-val{ display:inline-flex; align-items:baseline; gap:2px; font-variant-numeric:tabular-nums; }
+  .move-readout .rk-val b{
+    font-size:25px; font-weight:700; line-height:1; letter-spacing:-0.02em; color:var(--sage-deep);
+  }
+  .move-readout .rk-val .u{ font-size:12px; font-weight:700; color:var(--sage); margin-left:1px; }
+  .move-readout .rk-sub{ flex:1 0 100%; margin:7px 0 0; font-size:11.5px; line-height:1.5; color:var(--ink-soft); }
+  .move-readout .rk-basis{ color:var(--muted); font-weight:600; }
 
   .suggest{
     background:linear-gradient(155deg, #F5FAF2 0%, #FFFDF8 55%, #FDF7EF 100%);
@@ -388,6 +435,7 @@
   .dot.heavy{ background:#DFB49C; }
   .dot.none{ background:#E4E0D5; }
   .day-water{ margin:4px 0 0; font-size:11.5px; color:#7FA9B8; font-weight:600; }
+  .day-step{ margin:3px 0 0; font-size:11.5px; color:var(--sage); font-weight:600; }
   .day-icons{ flex:0 0 auto; display:flex; gap:6px; }
   .day-icons .ic{
     width:30px; height:30px; border-radius:11px; display:flex; align-items:center; justify-content:center;
@@ -518,10 +566,60 @@
         </div>
       </div>
 
-      <div class="card activity-card">
-        <div class="seg" id="activitySeg" role="group" aria-label="오늘 활동량">
-          <button type="button" data-activity="usual" aria-pressed="true">평소 같은 날</button>
-          <button type="button" data-activity="active" aria-pressed="false"><span class="em">🚶</span>많이 움직인 날</button>
+      <div class="card move-card" id="moveCard" data-number-ok>
+        <div class="suggest-top">
+          <span class="ic">👟</span>
+          <p class="eyebrow">오늘 움직임</p>
+        </div>
+        <p class="muted" style="margin:2px 0 0;">걸음 수와 운동만 적으면 오늘 유지칼로리가 바로 바뀌어요.</p>
+
+        <div class="move-block">
+          <p class="move-label"><span class="em">🚶</span>걸음 수</p>
+          <div class="num-field">
+            <input id="stepsInput" type="number" inputmode="numeric" min="0" max="50000" step="500" placeholder="6,000" aria-label="오늘 걸음 수">
+            <span class="suffix">보</span>
+          </div>
+          <div class="quick-chips" id="stepChips" role="group" aria-label="걸음 수 빠른 선택">
+            <button type="button" class="qchip" data-steps="5000">5,000</button>
+            <button type="button" class="qchip" data-steps="8000">8,000</button>
+            <button type="button" class="qchip" data-steps="10000">10,000</button>
+            <button type="button" class="qchip" data-steps="12000">12,000</button>
+          </div>
+          <p class="move-hint">비워 두면 평소(6,000보)로 계산해요.</p>
+        </div>
+
+        <div class="move-block">
+          <p class="move-label"><span class="em">🧘</span>운동</p>
+          <div class="seg ex-seg" id="exerciseSeg" role="group" aria-label="오늘 한 운동">
+            <button type="button" data-exercise="none" aria-pressed="true">없음</button>
+            <button type="button" data-exercise="pilates" aria-pressed="false">필라테스·요가</button>
+            <button type="button" data-exercise="strength" aria-pressed="false">근력·빠른 걷기</button>
+            <button type="button" data-exercise="cardio" aria-pressed="false">유산소</button>
+          </div>
+          <div id="exerciseMinBlock" class="hidden">
+            <div class="num-field" style="margin-top:10px;">
+              <input id="minInput" type="number" inputmode="numeric" min="0" max="300" step="5" placeholder="30" aria-label="운동한 시간(분)">
+              <span class="suffix">분</span>
+            </div>
+            <div class="quick-chips" id="minChips" role="group" aria-label="운동 시간 빠른 선택">
+              <button type="button" class="qchip" data-min="20">20분</button>
+              <button type="button" class="qchip" data-min="30">30분</button>
+              <button type="button" class="qchip" data-min="45">45분</button>
+              <button type="button" class="qchip" data-min="60">60분</button>
+            </div>
+          </div>
+          <div class="num-field" style="margin-top:10px;">
+            <input id="burnInput" type="number" inputmode="numeric" min="0" max="2000" step="5" placeholder="워치에 나온 소모값 (선택)" aria-label="직접 적는 운동 소모 칼로리">
+            <span class="suffix">kcal</span>
+          </div>
+          <p class="move-hint">워치에 나온 값이 있으면 직접 적어 주세요. 적으면 그 값으로 계산해요.</p>
+        </div>
+
+        <div class="move-readout" id="moveReadout">
+          <span class="rk-label">오늘 유지칼로리</span>
+          <span class="rk-val"><b id="maintKcal">1,500</b><span class="u">kcal</span></span>
+          <p class="rk-sub" id="maintNote">평소와 비슷하게 움직였어요</p>
+          <p class="rk-sub rk-basis" id="moveBasis">걸음 6,000보 · 운동은 아직 없어요</p>
         </div>
       </div>
 
@@ -719,10 +817,59 @@
     '커피':             { k: 10,  c: 1,  p: 0.5,f: 0 }
   };
 
-  var TARGETS = {
-    usual:  { k: 1500, c: 195, p: 55, f: 50 },
-    active: { k: 1700, c: 225, p: 60, f: 55 }
+  // 153cm / 40kg · 기초대사량 ~1,095kcal · 평소 일상 6,000걸음 기준 유지선 1,500kcal
+  var MOVE_BASE_STEPS = 6000;      // 평소 하루 걸음 수
+  var MOVE_BASE_KCAL = 1500;       // 그때의 유지선
+  var STEPS_KCAL_PER_1000 = 25;    // 1,000보당 ±25kcal
+  var MOVE_MIN_KCAL = 1400;        // 하한선 (기초대사 아래로 내려가지 않게)
+  var MOVE_MAX_STEPS = 50000;
+  var MOVE_MAX_EX_KCAL = 2000;
+
+  // 운동 종류별 분당 소모
+  var EXERCISE_TYPES = {
+    none:     { label: '운동',          perMin: 0 },
+    pilates:  { label: '필라테스·요가', perMin: 2.8 },
+    strength: { label: '근력·빠른 걷기', perMin: 4.2 },
+    cardio:   { label: '유산소',        perMin: 6.0 }
   };
+
+  // 목표선의 탄단지 비율은 1,500kcal 기준값을 그대로 비례해서 쓴다
+  var MACRO_SPLIT = { c: 195 / 1500, p: 55 / 1500, f: 50 / 1500 };
+
+  function moveSteps(day) {
+    var v = day ? day.steps : null;
+    if (typeof v !== 'number' || !isFinite(v) || v < 0) return MOVE_BASE_STEPS;
+    return Math.min(MOVE_MAX_STEPS, v);
+  }
+
+  function moveExerciseKcal(day) {
+    if (!day) return 0;
+    var direct = Number(day.exerciseKcal);
+    if (isFinite(direct) && direct > 0) return Math.min(MOVE_MAX_EX_KCAL, direct);
+    var kind = EXERCISE_TYPES[day.exercise] ? day.exercise : 'none';
+    var mins = Number(day.exerciseMin);
+    if (!isFinite(mins) || mins <= 0) return 0;
+    return EXERCISE_TYPES[kind].perMin * Math.min(300, mins);
+  }
+
+  // 오늘 유지칼로리: 기본선 + 걸음 수 차이 + 운동량 → 10단위 반올림
+  function targetKcal(day) {
+    var steps = moveSteps(day);
+    var kcal = MOVE_BASE_KCAL
+      + ((steps - MOVE_BASE_STEPS) / 1000) * STEPS_KCAL_PER_1000
+      + moveExerciseKcal(day);
+    if (kcal < MOVE_MIN_KCAL) kcal = MOVE_MIN_KCAL;
+    return Math.round(kcal / 10) * 10;
+  }
+
+  function targetFor(day) {
+    var kcal = targetKcal(day);
+    return { k: kcal, c: kcal * MACRO_SPLIT.c, p: kcal * MACRO_SPLIT.p, f: kcal * MACRO_SPLIT.f };
+  }
+
+  function moveDiffKcal(day) {
+    return targetKcal(day) - MOVE_BASE_KCAL;
+  }
 
   var PORTION = {
     light:  { label: '가볍게',   mult: 0.7 },
@@ -796,10 +943,13 @@
 
   // The hidden guide. Returns only gentle Korean wording — never a number.
   function buildSuggestion(day, now) {
-    var target = TARGETS[day && day.activity === 'active' ? 'active' : 'usual'];
+    var target = targetFor(day);
     var totals = dayTotals(day);
     var hour = now.getHours();
-    var active = !!(day && day.activity === 'active');
+    var steps = moveSteps(day);
+    var exKcal = moveExerciseKcal(day);
+    // 많이 움직인 날 = 걸음이 평소보다 확실히 많거나, 운동으로 꽤 쓴 날
+    var active = steps >= 9000 || exKcal >= 30;
     var meals = (day && day.meals) || [];
     var ratio = target.k > 0 ? totals.k / target.k : 0;
     var last = lastMeal(day);
@@ -807,7 +957,6 @@
     var lowCarb = totals.c < target.c * 0.5;
     var lowProtein = totals.p < target.p * 0.5;
     var proteinNote = '단백질은 두부 한 접시나 두유 한 잔으로 가볍게 채워 두면 좋아요.';
-    var carbNote = '탄수화물(밥·빵·과일)을 평소보다 조금 더 챙겨야 밤에 허기가 안 터져요.';
 
     if (!meals.length) {
       if (hour < 10) {
@@ -851,11 +1000,15 @@
           aside: '늦은 시간이라도 배가 고프면 죽이나 미역국밥 반 그릇부터 천천히 시작해 보세요. 밥 반 공기까지 드셔도 괜찮아요 — 밤에 굶고 자면 새벽에 더 당겨요.'
         };
       }
+      if (active) {
+        return {
+          main: '오늘 많이 움직여서 유지선에 여유가 생겼어요.',
+          aside: '간식이나 밥을 조금 더 든든히 챙겨도 좋아요. 밥 반 공기에 반찬 두 가지, 과일 한 조각까지 곁들여 보세요.'
+        };
+      }
       return {
-        main: active ? '오늘 많이 움직이셨어요! 아직 여유가 꽤 있어요.' : '아직 여유가 꽤 있어요.',
-        aside: active
-          ? '밥 반 공기에 반찬 두 가지를 곁들여 조금 넉넉하게, 과일 한 조각까지 챙겨 보세요. ' + carbNote
-          : '밥 반 공기에 따뜻한 반찬 두 가지면 딱 좋아요.' + (lowCarb ? ' 빵이나 과일도 한 조각 곁들여 보세요.' : ' 다음 끼니에 과일 한 조각도 좋아요.')
+        main: '아직 여유가 꽤 있어요.',
+        aside: '밥 반 공기에 따뜻한 반찬 두 가지면 딱 좋아요.' + (lowCarb ? ' 빵이나 과일도 한 조각 곁들여 보세요.' : ' 다음 끼니에 과일 한 조각도 좋아요.')
       };
     }
 
@@ -892,7 +1045,7 @@
   // 오늘 유지선 대비 채움 정도. 화면에는 오직 퍼센티지(%)만 나간다.
   // 숨은 영양 수치는 이 함수 밖으로 나가지 않는다.
   function fillMeter(day, now) {
-    var target = TARGETS[day && day.activity === 'active' ? 'active' : 'usual'];
+    var target = targetFor(day);
     var totals = dayTotals(day);
     var pct = target.k > 0 ? Math.round(totals.k / target.k * 100) : 0;
     if (!isFinite(pct) || pct < 0) pct = 0;
@@ -917,7 +1070,7 @@
       return out;
     }
 
-    if (pct < 30) out.note = '아직 여유가 많아요';
+    if (pct < 30) out.note = (target.k >= MOVE_BASE_KCAL + 150) ? '많이 움직인 만큼 여유가 많아요' : '아직 여유가 많아요';
     else if (pct < 55) out.note = '절반을 향해 가는 중이에요';
     else if (pct < 75) out.note = '딱 알맞게 채워지는 중이에요';
     else if (pct < 95) out.note = '거의 다 채워졌어요';
@@ -927,7 +1080,7 @@
   }
 
   function weekSummary(days) {
-    var withMeals = [], calm = 0, chewDays = 0, waterDays = 0;
+    var withMeals = [], calm = 0, chewDays = 0, waterDays = 0, stepDays = 0;
     for (var i = 0; i < days.length; i++) {
       var d = days[i];
       if (d && d.meals && d.meals.length) {
@@ -936,6 +1089,7 @@
       }
       if (d && d.bites > 0) chewDays += 1;
       if (d && d.water > 0) waterDays += 1;
+      if (d && moveSteps(d) > MOVE_BASE_STEPS) stepDays += 1;
     }
     if (!withMeals.length) {
       return {
@@ -950,6 +1104,7 @@
     if (chewDays > 0) subParts.push('천천히 씹기도 스스로 켜서 해 보셨어요.');
     else subParts.push('한 입 타이머는 다음 끼니에 한 번만 켜 봐도 좋아요.');
     if (waterDays > 0) subParts.push('물도 조금씩 나눠 마신 날이 있었어요.');
+    if (stepDays > 0) subParts.push('평소보다 많이 걸은 날도 있었어요.');
     return { main: main, sub: subParts.join(' ') };
   }
 
@@ -976,6 +1131,10 @@
     return {
       key: key,
       activity: 'usual',
+      steps: null,
+      exercise: 'none',
+      exerciseMin: null,
+      exerciseKcal: null,
       meals: [],
       bites: 0,
       feels: [],
@@ -1004,6 +1163,22 @@
       if (typeof d.bites !== 'number' || !isFinite(d.bites)) d.bites = 0;
       if (typeof d.water !== 'number' || !isFinite(d.water)) d.water = 0;
       if (d.activity !== 'active') d.activity = 'usual';
+      if (typeof d.steps !== 'number' || !isFinite(d.steps) || d.steps < 0) {
+        d.steps = null;
+      } else {
+        d.steps = Math.min(MOVE_MAX_STEPS, Math.round(d.steps));
+      }
+      if (!EXERCISE_TYPES[d.exercise]) d.exercise = 'none';
+      if (typeof d.exerciseMin !== 'number' || !isFinite(d.exerciseMin) || d.exerciseMin <= 0) {
+        d.exerciseMin = null;
+      } else {
+        d.exerciseMin = Math.min(300, Math.round(d.exerciseMin));
+      }
+      if (typeof d.exerciseKcal !== 'number' || !isFinite(d.exerciseKcal) || d.exerciseKcal <= 0) {
+        d.exerciseKcal = null;
+      } else {
+        d.exerciseKcal = Math.min(MOVE_MAX_EX_KCAL, Math.round(d.exerciseKcal));
+      }
       d.key = k;
     });
     if (!parsed.settings || typeof parsed.settings !== 'object') parsed.settings = {};
@@ -1037,6 +1212,11 @@
     return String(s).replace(/[&<>"']/g, function (ch) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
     });
+  }
+
+  function fmtNum(n) {
+    var v = Math.round(Number(n) || 0);
+    return String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
   function weekdayKo(d) {
@@ -1384,13 +1564,66 @@
     $('fillMeter').setAttribute('data-state', m.tone);
   }
 
-  function renderActivity() {
-    var buttons = $('activitySeg').querySelectorAll('button');
-    var active = today().activity === 'active';
-    for (var i = 0; i < buttons.length; i++) {
-      var isActive = buttons[i].getAttribute('data-activity') === 'active';
-      buttons[i].setAttribute('aria-pressed', (isActive === active) ? 'true' : 'false');
+  /* ---------- 오늘 움직임 ---------- */
+  function maintNoteFor(diff) {
+    if (diff >= 200) return '평소보다 많이 움직여서 여유가 넉넉해요';
+    if (diff >= 60) return '평소보다 조금 더 움직인 날이에요';
+    if (diff > 20) return '평소와 거의 비슷하게 움직였어요';
+    if (diff <= -100) return '오늘은 몸을 조금 아껴 둔 날이에요';
+    return '평소와 비슷하게 움직였어요';
+  }
+
+  function moveBasisText(day) {
+    var parts = [];
+    parts.push('걸음 ' + fmtNum(moveSteps(day)) + '보' + (day.steps == null ? ' (평소 기준)' : ''));
+    var exKcal = moveExerciseKcal(day);
+    if (exKcal > 0) {
+      if (day.exerciseKcal) {
+        parts.push((EXERCISE_TYPES[day.exercise] && day.exercise !== 'none'
+          ? EXERCISE_TYPES[day.exercise].label : '운동') + ' ' + fmtNum(day.exerciseKcal) + 'kcal');
+      } else {
+        parts.push(EXERCISE_TYPES[day.exercise].label + ' ' + fmtNum(day.exerciseMin) + '분');
+      }
+    } else {
+      parts.push('운동은 아직 없어요');
     }
+    return parts.join(' · ');
+  }
+
+  // opts.keepInputs: 입력 중인 칸의 글자를 되돌려 쓰지 않는다
+  function renderMove(opts) {
+    var day = today();
+    var keep = !!(opts && opts.keepInputs);
+    var steps = day.steps;
+
+    if (!keep) {
+      $('stepsInput').value = (typeof steps === 'number') ? String(steps) : '';
+      $('minInput').value = (typeof day.exerciseMin === 'number') ? String(day.exerciseMin) : '';
+      $('burnInput').value = (typeof day.exerciseKcal === 'number') ? String(day.exerciseKcal) : '';
+    }
+
+    var stepChips = $('stepChips').querySelectorAll('button');
+    for (var i = 0; i < stepChips.length; i++) {
+      var on = (typeof steps === 'number') && Number(stepChips[i].getAttribute('data-steps')) === steps;
+      stepChips[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+
+    var kind = day.exercise || 'none';
+    var exBtns = $('exerciseSeg').querySelectorAll('button');
+    for (var j = 0; j < exBtns.length; j++) {
+      exBtns[j].setAttribute('aria-pressed', exBtns[j].getAttribute('data-exercise') === kind ? 'true' : 'false');
+    }
+    $('exerciseMinBlock').classList.toggle('hidden', kind === 'none');
+
+    var minChips = $('minChips').querySelectorAll('button');
+    for (var m = 0; m < minChips.length; m++) {
+      var minOn = (typeof day.exerciseMin === 'number') && Number(minChips[m].getAttribute('data-min')) === day.exerciseMin;
+      minChips[m].setAttribute('aria-pressed', minOn ? 'true' : 'false');
+    }
+
+    $('maintKcal').textContent = fmtNum(targetKcal(day));
+    $('maintNote').textContent = maintNoteFor(moveDiffKcal(day));
+    $('moveBasis').textContent = moveBasisText(day);
   }
 
   /* ---------- week ---------- */
@@ -1419,14 +1652,17 @@
       var dayLabel = isToday ? '오늘' : (j === days.length - 2 ? '어제' : '');
       var waterText = (day.water > 0) ? ('물 ' + day.water + 'ml') : '';
       var waterHtml = waterText ? ('<p class="day-water" data-number-ok>' + waterText + '</p>') : '';
+      var stepText = (typeof day.steps === 'number' && day.steps > 0)
+        ? ('<p class="day-step" data-number-ok>걸음 ' + fmtNum(day.steps) + '보</p>') : '';
       var chewOn = day.bites > 0;
-      var activeOn = day.activity === 'active';
+      var activeOn = day.activity === 'active' || moveSteps(day) >= 9000 || moveExerciseKcal(day) > 0;
 
       html += '<div class="day-row' + (isToday ? ' today' : '') + '">'
         + '<div class="day-name"><b>' + weekdayKo(item.date) + '</b><span>' + (dayLabel || '&nbsp;') + '</span></div>'
         + '<div class="day-mid">'
         + '<p class="day-tummy"><span class="dot ' + dotClass + '"></span>' + tummyLabel + '</p>'
         + waterHtml
+        + stepText
         + '</div>'
         + '<div class="day-icons">'
         + '<span class="ic ' + (chewOn ? 'on' : 'dim') + '" title="천천히 씹기">🥄</span>'
@@ -1447,7 +1683,7 @@
     renderChewCount();
     renderSoundToggle();
     renderWater();
-    renderActivity();
+    renderMove();
     renderSuggestion();
     renderSlots();
     renderChips();
@@ -1468,7 +1704,7 @@
       btn.setAttribute('aria-selected', isOn ? 'true' : 'false');
       panel.classList.toggle('hidden', !isOn);
     }
-    if (tabId === 'meal') { renderSuggestion(); renderMealList(); renderWater(); }
+    if (tabId === 'meal') { renderMove(); renderSuggestion(); renderMealList(); renderWater(); }
     if (tabId === 'week') renderWeek();
     window.scrollTo({ top: 0, behavior: 'auto' });
   }
@@ -1538,17 +1774,78 @@
       renderWeek();
     });
 
-    $('activitySeg').addEventListener('click', function (e) {
+    /* ---- 오늘 움직임: 걸음 수 · 운동 → 유지칼로리 ---- */
+    function applySteps(raw, keepInputs) {
+      var digits = String(raw == null ? '' : raw).replace(/[^0-9]/g, '');
+      var day = today();
+      day.steps = digits ? Math.min(MOVE_MAX_STEPS, Number(digits)) : null;
+      saveState();
+      renderMove({ keepInputs: keepInputs });
+      renderSuggestion();
+      renderWeek();
+    }
+
+    function applyExerciseMin(raw, keepInputs) {
+      var digits = String(raw == null ? '' : raw).replace(/[^0-9]/g, '');
+      var day = today();
+      day.exerciseMin = digits ? Math.min(300, Number(digits)) : null;
+      saveState();
+      renderMove({ keepInputs: keepInputs });
+      renderSuggestion();
+      renderWeek();
+    }
+
+    function applyBurn(raw, keepInputs) {
+      var digits = String(raw == null ? '' : raw).replace(/[^0-9]/g, '');
+      var day = today();
+      day.exerciseKcal = digits ? Math.min(MOVE_MAX_EX_KCAL, Number(digits)) : null;
+      saveState();
+      renderMove({ keepInputs: keepInputs });
+      renderSuggestion();
+      renderWeek();
+    }
+
+    $('stepsInput').addEventListener('input', function () { applySteps(this.value, true); });
+    $('stepsInput').addEventListener('change', function () { applySteps(this.value, true); });
+    $('stepChips').addEventListener('click', function (e) {
       var btn = e.target.closest('button');
       if (!btn) return;
-      var value = btn.getAttribute('data-activity');
+      var value = Number(btn.getAttribute('data-steps'));
+      if (!value) return;
+      applySteps(String(value));
+    });
+
+    $('exerciseSeg').addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      var kind = btn.getAttribute('data-exercise');
       var day = today();
-      day.activity = value === 'active' ? 'active' : 'usual';
+      day.exercise = EXERCISE_TYPES[kind] ? kind : 'none';
+      if (day.exercise === 'none') {
+        // '없음'은 오늘 운동을 통째로 지우는 뜻이므로 시간·직접 소모값도 함께 비운다
+        day.exerciseMin = null;
+        day.exerciseKcal = null;
+      } else if (!day.exerciseMin && !day.exerciseKcal) {
+        day.exerciseMin = 30;
+      }
       saveState();
-      renderActivity();
+      renderMove();
       renderSuggestion();
       renderWeek();
     });
+
+    $('minInput').addEventListener('input', function () { applyExerciseMin(this.value, true); });
+    $('minInput').addEventListener('change', function () { applyExerciseMin(this.value, true); });
+    $('minChips').addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      var value = Number(btn.getAttribute('data-min'));
+      if (!value) return;
+      applyExerciseMin(String(value));
+    });
+
+    $('burnInput').addEventListener('input', function () { applyBurn(this.value, true); });
+    $('burnInput').addEventListener('change', function () { applyBurn(this.value, true); });
 
     $('slotPicker').addEventListener('click', function (e) {
       var btn = e.target.closest('button');
