@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF6EE">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="천천히 식사">
+<meta name="format-detection" content="telephone=no">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23FBF6EE'/%3E%3Cpath d='M14 33h36c0 10.5-8 18-18 18s-18-7.5-18-18z' fill='%23C9DFC4'/%3E%3Cpath d='M16 33h32' stroke='%237E9B80' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M39 29c5-9 12-12 17-11-1 8-7 12-17 11z' fill='%237E9B80'/%3E%3C/svg%3E">
+<title>천천히, 편안하게</title>
+<style>
+  :root{
+    --cream:#FBF6EE;
+    --cream-2:#F3ECDF;
+    --card:#FFFDF9;
+    --sage:#7E9B80;
+    --sage-deep:#5C7860;
+    --sage-soft:#E1EBDC;
+    --sage-line:rgba(126,155,128,.16);
+    --blue:#A9C6D6;
+    --blue-soft:#E6F1F5;
+    --peach:#EBD2BC;
+    --ink:#3B473B;
+    --ink-soft:#66735F;
+    --muted:#96A08F;
+    --shadow:0 10px 26px rgba(96,112,90,.08);
+    --shadow-soft:0 4px 14px rgba(96,112,90,.06);
+    --r:22px;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    margin:0;
+    font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(120% 60% at 100% 0%, #F6EFE2 0%, rgba(246,239,226,0) 60%),
+      radial-gradient(90% 50% at 0% 10%, #EAF1E6 0%, rgba(234,241,230,0) 55%),
+      linear-gradient(180deg, #FCF8F1 0%, #F8F4EB 40%, #F4F1E8 100%);
+    min-height:100vh;
+    min-height:100dvh;
+    letter-spacing:-0.01em;
+  }
+  .app{
+    max-width:430px;
+    margin:0 auto;
+    padding: calc(env(safe-area-inset-top) + 14px) 18px calc(104px + env(safe-area-inset-bottom));
+  }
+
+  /* ---------- top bar ---------- */
+  .topbar{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:6px 4px 16px; }
+  .brand{ display:flex; gap:10px; align-items:center; }
+  .brand .leaf{ font-size:22px; filter:saturate(.9); }
+  .brand h1{ font-size:20px; line-height:1.25; margin:0; font-weight:700; letter-spacing:-0.02em; }
+  .brand p{ margin:2px 0 0; font-size:12.5px; color:var(--muted); }
+  .date-pill{
+    font-size:12px; color:var(--sage-deep); background:rgba(225,235,220,.7);
+    border:1px solid var(--sage-line); border-radius:999px; padding:7px 12px;
+    white-space:nowrap; font-weight:600;
+  }
+
+  /* ---------- cards ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid rgba(126,155,128,.12);
+    border-radius:var(--r);
+    box-shadow:var(--shadow);
+    padding:18px;
+    margin-bottom:14px;
+  }
+  .card h2{ font-size:17px; margin:0 0 6px; font-weight:700; letter-spacing:-0.02em; }
+  .card h3{ font-size:15px; margin:0 0 12px; font-weight:700; }
+  .eyebrow{
+    margin:0; font-size:11.5px; font-weight:700; letter-spacing:.02em;
+    color:var(--sage); text-transform:none;
+  }
+  .muted{ color:var(--muted); font-size:13px; line-height:1.5; margin:0; }
+  .hidden{ display:none !important; }
+
+  /* ---------- tabs ---------- */
+  .tab-panel{ animation:fadeIn .28s ease; }
+  @keyframes fadeIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+
+  .tabbar{
+    position:fixed; left:50%; bottom:0; transform:translateX(-50%);
+    width:100%; max-width:430px;
+    display:flex; gap:6px;
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+    background:rgba(255,253,249,.88);
+    backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+    border-top:1px solid rgba(126,155,128,.14);
+    z-index:20;
+  }
+  .tabbar button{
+    flex:1; border:0; background:transparent; border-radius:16px;
+    padding:8px 4px 7px; display:flex; flex-direction:column; align-items:center; gap:3px;
+    font-family:inherit; font-size:11.5px; font-weight:600; color:var(--muted);
+    transition:background .18s ease, color .18s ease, transform .18s ease;
+  }
+  .tabbar button .ic{ font-size:19px; line-height:1; filter:grayscale(.35); transition:filter .18s ease, transform .18s ease; }
+  .tabbar button[aria-selected="true"]{ background:var(--sage-soft); color:var(--sage-deep); }
+  .tabbar button[aria-selected="true"] .ic{ filter:none; transform:translateY(-1px); }
+  .tabbar button:active{ transform:scale(.97); }
+
+  /* ---------- generic buttons ---------- */
+  .btn{
+    border:0; font-family:inherit; font-weight:700; font-size:14px;
+    border-radius:16px; padding:13px 18px; cursor:pointer;
+    transition:transform .14s ease, box-shadow .18s ease, background .18s ease;
+  }
+  .btn:active{ transform:scale(.975); }
+  .btn.primary{
+    background:linear-gradient(160deg, #8CAA8C 0%, #71906F 100%);
+    color:#FFFDF8; box-shadow:0 8px 18px rgba(113,144,111,.28);
+  }
+  .btn.ghost{
+    background:#F5F1E8; color:var(--ink-soft);
+    border:1px solid rgba(126,155,128,.16);
+  }
+  .link-btn{
+    border:0; background:none; font-family:inherit; font-size:12.5px; font-weight:600;
+    color:var(--muted); text-decoration:underline; text-underline-offset:3px;
+    padding:8px 2px; cursor:pointer;
+  }
+
+  /* ---------- chew tab ---------- */
+  .chew-hero{ background:linear-gradient(165deg, #FFFDF9 0%, #F4F8F1 100%); }
+  .chew-hero p.lead{ margin:0 0 16px; color:var(--ink-soft); font-size:13.5px; line-height:1.55; }
+  .seg{
+    display:flex; gap:6px; background:#F3EFE5; border-radius:15px; padding:4px;
+  }
+  .seg button{
+    flex:1; border:0; background:transparent; font-family:inherit; font-weight:700;
+    font-size:13px; color:var(--ink-soft); border-radius:12px; padding:9px 4px; cursor:pointer;
+    transition:background .18s ease, color .18s ease, box-shadow .18s ease;
+  }
+  .seg button[aria-pressed="true"]{
+    background:#FFFDF9; color:var(--sage-deep); box-shadow:0 2px 8px rgba(96,112,90,.10);
+  }
+  .seg.hint{ margin-top:10px; }
+
+  .timer-card{ text-align:center; padding-top:22px; }
+  .ring-wrap{
+    position:relative; width:228px; height:228px; margin:2px auto 6px;
+  }
+  .ring{ width:100%; height:100%; display:block; }
+  .ring-track{ fill:none; stroke:#F0EADD; stroke-width:12; }
+  .ring-prog{
+    fill:none; stroke:url(#ringGrad); stroke-width:12; stroke-linecap:round;
+    stroke-dasharray:653.45; stroke-dashoffset:0;
+    transform:rotate(-90deg); transform-box:fill-box; transform-origin:center;
+    transition:stroke-dashoffset .16s linear;
+  }
+  .breathe{
+    fill:rgba(200,222,195,.22);
+    transform-box:fill-box; transform-origin:center;
+    transition:opacity .3s ease;
+  }
+  .running .breathe{ animation:breathe 4.2s ease-in-out infinite; }
+  @keyframes breathe{
+    0%,100%{ transform:scale(.9); opacity:.45; }
+    50%{ transform:scale(1.05); opacity:.95; }
+  }
+  .ring-center{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:2px;
+  }
+  .ring-center .count{
+    font-size:52px; font-weight:600; line-height:1; letter-spacing:-0.03em;
+    font-variant-numeric:tabular-nums; color:var(--sage-deep);
+  }
+  .ring-center .unit{ font-size:12.5px; color:var(--muted); font-weight:600; }
+  .timer-msg{
+    min-height:44px; margin:6px 4px 14px; font-size:14px; line-height:1.5;
+    color:var(--ink-soft);
+  }
+  .timer-msg.done{ color:var(--sage-deep); font-weight:700; }
+  .timer-actions{ display:flex; gap:8px; }
+  .timer-actions .btn{ flex:1; padding:14px 12px; }
+  .timer-actions .btn.ghost{ flex:0 0 auto; font-size:13px; padding:14px 14px; }
+
+  .feel-grid{ display:flex; flex-direction:column; gap:8px; }
+  .feel-grid button{
+    border:1px solid rgba(126,155,128,.16); background:#FBF8F1;
+    font-family:inherit; font-size:14px; font-weight:600; color:var(--ink-soft);
+    border-radius:16px; padding:13px 14px; text-align:left; cursor:pointer;
+    display:flex; align-items:center; gap:10px;
+    transition:background .18s ease, border-color .18s ease, transform .14s ease;
+  }
+  .feel-grid button .dot{ width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+  .feel-grid button:active{ transform:scale(.985); }
+  .feel-grid button[data-feel="여유"] .dot{ background:#A9C6A4; }
+  .feel-grid button[data-feel="좋아"] .dot{ background:#9FC9CF; }
+  .feel-grid button[data-feel="배불러"] .dot{ background:var(--peach); }
+  .feel-grid button[aria-pressed="true"]{
+    background:var(--sage-soft); border-color:rgba(126,155,128,.4); color:var(--sage-deep);
+  }
+  .feedback{
+    margin:14px 0 0; font-size:13.5px; line-height:1.6; color:var(--ink-soft);
+    background:#F7FAF4; border-radius:14px; padding:12px 14px;
+    border:1px solid rgba(126,155,128,.12);
+  }
+  .feedback:empty{ display:none; }
+  .chew-foot{
+    text-align:center; font-size:12.5px; color:var(--muted); padding:2px 0 4px;
+  }
+  .chew-foot strong{ color:var(--sage-deep); font-weight:700; }
+
+  /* ---------- water card ---------- */
+  .water-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .water-head h3{ margin:0; }
+  .water-head .hint{ font-size:11.5px; color:var(--muted); }
+  .water-body{ display:flex; align-items:center; gap:18px; }
+  .cup{ width:84px; height:106px; flex:0 0 auto; }
+  .water-group{ transition:transform .85s cubic-bezier(.34,.1,.25,1); }
+  .wave{ animation:drift 5.4s linear infinite; }
+  @keyframes drift{ from{ transform:translateX(0); } to{ transform:translateX(-24px); } }
+  .water-figures{ flex:1; min-width:0; }
+  .water-ml{ margin:0; font-size:27px; font-weight:700; letter-spacing:-0.03em; color:var(--sage-deep); }
+  .water-ml .num{ font-size:inherit; }
+  .water-ml .u{ font-size:13px; font-weight:600; color:var(--muted); margin-left:3px; }
+  .water-cups{ margin:4px 0 0; font-size:12.5px; color:var(--ink-soft); }
+  .water-goal{ margin:6px 0 0; font-size:11.5px; color:var(--muted); }
+  .water-btns{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:16px; }
+  .water-btns button{
+    border:1px solid rgba(126,155,128,.16); background:#F6FAFB;
+    border-radius:14px; padding:9px 2px 8px; cursor:pointer;
+    font-family:inherit; display:flex; flex-direction:column; align-items:center; gap:2px;
+    color:#4E6E77; transition:transform .14s ease, background .18s ease;
+  }
+  .water-btns button:active{ transform:scale(.96); background:#E9F4F7; }
+  .water-btns button b{ font-size:18px; line-height:1; font-weight:700; color:#7FB4C4; }
+  .water-btns button span{ font-size:11px; font-weight:700; color:var(--ink-soft); }
+  .water-btns button small{ font-size:9.5px; color:var(--muted); }
+  .water-foot{ display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
+  .water-msg{ font-size:11.5px; color:var(--sage); font-weight:600; margin:0; }
+  #waterUndo[disabled]{ opacity:.35; text-decoration:none; }
+
+  /* ---------- meal tab ---------- */
+  .activity-card{ padding:12px; }
+  .activity-card .seg button{ padding:11px 4px; font-size:13px; }
+  .activity-card .seg button .em{ margin-right:4px; }
+
+  .suggest{
+    background:linear-gradient(155deg, #F5FAF2 0%, #FFFDF8 55%, #FDF7EF 100%);
+    border-color:rgba(126,155,128,.2);
+    position:relative; overflow:hidden;
+  }
+  .suggest::after{
+    content:""; position:absolute; right:-38px; top:-46px; width:120px; height:120px; pointer-events:none;
+    border-radius:50%; background:radial-gradient(circle, rgba(200,222,195,.5), rgba(200,222,195,0) 70%);
+  }
+  .suggest-top{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .suggest-top .ic{ font-size:16px; }
+  .suggest-main{ margin:0; font-size:15.5px; line-height:1.55; font-weight:700; color:var(--sage-deep); }
+  .suggest-aside{ margin:8px 0 0; font-size:13.5px; line-height:1.65; color:var(--ink-soft); }
+
+  .slots{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:16px; }
+  .slots button{
+    border:1px solid rgba(126,155,128,.16); background:#FBF8F1; border-radius:14px;
+    padding:10px 2px; font-family:inherit; font-size:13px; font-weight:600; color:var(--ink-soft);
+    cursor:pointer; transition:background .16s ease, color .16s ease, border-color .16s ease;
+  }
+  .slots button[aria-pressed="true"]{
+    background:var(--sage-soft); color:var(--sage-deep); border-color:rgba(126,155,128,.42);
+  }
+
+  .group{ margin-bottom:12px; }
+  .group-label{ margin:0 0 7px; font-size:11.5px; font-weight:700; color:var(--muted); }
+  .chips{ display:flex; flex-wrap:wrap; gap:6px; }
+  .chip{
+    border:1px solid rgba(126,155,128,.16); background:#FCFAF4; border-radius:999px;
+    padding:8px 13px; font-family:inherit; font-size:12.5px; font-weight:600; color:var(--ink-soft);
+    cursor:pointer; transition:background .16s ease, color .16s ease, border-color .16s ease, transform .12s ease;
+  }
+  .chip:active{ transform:scale(.96); }
+  .chip[aria-pressed="true"]{
+    background:var(--sage-deep); color:#FFFDF8; border-color:var(--sage-deep);
+  }
+
+  .custom-row{ display:flex; gap:6px; margin:14px 0 4px; }
+  .custom-row input{
+    flex:1; min-width:0; border:1px solid rgba(126,155,128,.2); background:#FCFAF4;
+    border-radius:14px; padding:12px 13px; font-family:inherit; font-size:16px;
+    color:var(--ink); outline:none;
+  }
+  .custom-row input::placeholder{ color:#B4BBAE; font-size:13px; }
+  .custom-row input:focus{ border-color:rgba(126,155,128,.5); background:#FFFDF8; }
+  .custom-row button{
+    border:0; background:#EFEADD; color:var(--sage-deep); font-family:inherit; font-weight:700;
+    font-size:13px; border-radius:14px; padding:0 16px; cursor:pointer;
+  }
+
+  .selected-name{
+    margin:14px 0 10px; font-size:13px; color:var(--ink-soft);
+    background:#F7FAF4; border-radius:12px; padding:10px 12px;
+  }
+  .selected-name b{ color:var(--sage-deep); }
+  .mini-label{ margin:0 0 7px; font-size:11.5px; font-weight:700; color:var(--muted); }
+  .portion-row{ display:flex; gap:6px; margin-bottom:14px; }
+  .portion-row button{
+    flex:1; border:1px solid rgba(126,155,128,.16); background:#FBF8F1; border-radius:13px;
+    padding:10px 2px; font-family:inherit; font-size:12.5px; font-weight:600; color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .portion-row button[aria-pressed="true"]{
+    background:var(--sage-soft); color:var(--sage-deep); border-color:rgba(126,155,128,.42);
+  }
+  .tummy-row{ display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
+  .tummy-row button{
+    flex:1; min-width:88px; border:1px solid rgba(126,155,128,.16); background:#FBF8F1; border-radius:13px;
+    padding:10px 4px; font-family:inherit; font-size:12px; font-weight:600; color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .tummy-row button[aria-pressed="true"]{
+    background:#F4F0E5; border-color:rgba(126,155,128,.42); color:var(--sage-deep);
+  }
+  .save-btn{ width:100%; margin-top:2px; }
+  .save-msg{
+    margin:12px 0 0; font-size:13px; line-height:1.55; color:var(--sage-deep);
+    background:#F1F7EE; border-radius:13px; padding:11px 13px; text-align:center;
+  }
+  .save-msg:empty{ display:none; }
+
+  .meal-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .meal-item{
+    display:flex; align-items:center; gap:10px;
+    background:#FCFAF5; border:1px solid rgba(126,155,128,.1);
+    border-radius:16px; padding:11px 12px;
+  }
+  .slot-badge{
+    flex:0 0 auto; font-size:10.5px; font-weight:700; color:var(--sage-deep);
+    background:var(--sage-soft); border-radius:8px; padding:5px 7px; min-width:34px; text-align:center;
+  }
+  .meal-main{ flex:1; min-width:0; }
+  .meal-name{ margin:0; font-size:14px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .meal-meta{ margin:3px 0 0; font-size:11.5px; color:var(--muted); }
+  .del{
+    flex:0 0 auto; border:0; background:transparent; color:#C0C6B8; font-size:19px; line-height:1;
+    padding:6px 4px 8px 8px; cursor:pointer;
+  }
+  .empty-note{ margin:0; font-size:13px; color:var(--muted); line-height:1.6; }
+
+  /* ---------- week tab ---------- */
+  .week-summary{ background:linear-gradient(160deg, #F6FAF2 0%, #FFFDF8 100%); }
+  .week-summary .sum-main{ margin:0; font-size:14.5px; line-height:1.62; font-weight:600; color:var(--sage-deep); }
+  .week-summary .sum-sub{ margin:8px 0 0; font-size:12.5px; line-height:1.6; color:var(--ink-soft); }
+
+  .week-list{ display:flex; flex-direction:column; gap:8px; }
+  .day-row{
+    display:flex; align-items:center; gap:12px;
+    background:var(--card); border:1px solid rgba(126,155,128,.12);
+    border-radius:18px; padding:13px 14px; box-shadow:var(--shadow-soft);
+  }
+  .day-row.today{ border-color:rgba(126,155,128,.38); background:linear-gradient(140deg,#F7FBF4,#FFFDF9); }
+  .day-name{ flex:0 0 46px; display:flex; flex-direction:column; gap:2px; }
+  .day-name b{ font-size:14px; font-weight:700; }
+  .day-name span{ font-size:10px; color:var(--muted); }
+  .day-mid{ flex:1; min-width:0; }
+  .day-tummy{ margin:0; font-size:13px; color:var(--ink-soft); display:flex; align-items:center; gap:6px; }
+  .day-tummy .dot{ width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+  .dot.calm{ background:#A9C6A4; }
+  .dot.mid{ background:#E2C89B; }
+  .dot.heavy{ background:#DFB49C; }
+  .dot.none{ background:#E4E0D5; }
+  .day-water{ margin:4px 0 0; font-size:11.5px; color:#7FA9B8; font-weight:600; }
+  .day-icons{ flex:0 0 auto; display:flex; gap:6px; }
+  .day-icons .ic{
+    width:30px; height:30px; border-radius:11px; display:flex; align-items:center; justify-content:center;
+    font-size:14px; background:#F5F2E9;
+  }
+  .day-icons .ic.on{ background:var(--sage-soft); }
+  .day-icons .ic.dim{ opacity:.35; }
+  .legend{ display:flex; flex-wrap:wrap; gap:10px 14px; font-size:11px; color:var(--muted); margin-top:2px; }
+  .legend span{ display:flex; align-items:center; gap:5px; }
+  .privacy-note{ text-align:center; font-size:11px; color:#AEB6A8; line-height:1.6; padding:10px 8px 0; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="leaf">🌿</span>
+      <div>
+        <h1 id="greeting">오늘도 편안하게</h1>
+        <p id="greetSub">천천히 씹고, 가볍게 남겨요</p>
+      </div>
+    </div>
+    <span class="date-pill" id="datePill" data-number-ok>오늘</span>
+  </header>
+
+  <main>
+    <!-- ================= 천천히 씹기 ================= -->
+    <section class="tab-panel" id="panel-chew" role="tabpanel" aria-labelledby="tab-chew">
+      <div class="card chew-hero">
+        <p class="eyebrow">한 입 타이머</p>
+        <h2>한 입을 오래, 천천히</h2>
+        <p class="lead">빠르게 삼키면 몸이 보내는 배부름 신호를 놓치기 쉬워요. 한 입만 천천히 씹어도 속이 훨씬 편해져요.</p>
+        <div class="seg" id="chewOptions" role="group" aria-label="한 입 씹는 시간" data-number-ok>
+          <button type="button" data-sec="20" aria-pressed="false">20초</button>
+          <button type="button" data-sec="25" aria-pressed="true">25초</button>
+          <button type="button" data-sec="30" aria-pressed="false">30초</button>
+          <button type="button" data-sec="40" aria-pressed="false">40초</button>
+        </div>
+      </div>
+
+      <div class="card timer-card" id="timerCard">
+        <div class="ring-wrap" id="ringWrap">
+          <svg class="ring" viewBox="0 0 240 240" aria-hidden="true">
+            <defs>
+              <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#A9C6D6"/>
+                <stop offset="55%" stop-color="#8FB59A"/>
+                <stop offset="100%" stop-color="#C9DFC4"/>
+              </linearGradient>
+            </defs>
+            <circle class="ring-track" cx="120" cy="120" r="104"/>
+            <circle class="breathe" cx="120" cy="120" r="88"/>
+            <circle class="ring-prog" id="ringProg" cx="120" cy="120" r="104"/>
+          </svg>
+          <div class="ring-center" data-number-ok>
+            <div class="count" id="timerCount">25</div>
+            <div class="unit" id="timerUnit">초</div>
+          </div>
+        </div>
+        <p class="timer-msg" id="timerMsg" aria-live="polite">준비되면 시작을 눌러 주세요</p>
+        <div class="timer-actions">
+          <button type="button" class="btn primary" id="timerBtn">시작</button>
+          <button type="button" class="btn ghost" id="resetBtn" hidden>처음부터</button>
+        </div>
+        <button type="button" class="link-btn" id="soundToggle" aria-pressed="true" style="margin-top:10px;">🔔 종소리 켜짐</button>
+      </div>
+
+      <div class="card">
+        <h3>지금 내 배는 어때요?</h3>
+        <p class="muted" style="margin:-4px 0 14px;">먹는 중간에 한 번씩 물어봐 주세요. 정답은 없어요.</p>
+        <div class="feel-grid" id="feelGrid">
+          <button type="button" data-feel="여유" aria-pressed="false"><span class="dot"></span>조금 여유 있어요</button>
+          <button type="button" data-feel="좋아" aria-pressed="false"><span class="dot"></span>딱 기분 좋아요</button>
+          <button type="button" data-feel="배불러" aria-pressed="false"><span class="dot"></span>배불러요 · 잠시 멈추기</button>
+        </div>
+        <p class="feedback" id="feelMsg" aria-live="polite"></p>
+      </div>
+
+      <p class="chew-foot" data-number-ok>오늘 천천히 씹은 한 입 <strong id="biteCount">0</strong>번</p>
+    </section>
+
+    <!-- ================= 오늘 식사 ================= -->
+    <section class="tab-panel hidden" id="panel-meal" role="tabpanel" aria-labelledby="tab-meal">
+
+      <div class="card">
+        <div class="water-head">
+          <h3>오늘의 물</h3>
+          <span class="hint" id="waterHint">한 모금부터 편하게</span>
+        </div>
+        <div class="water-body">
+          <svg class="cup" viewBox="0 0 96 120" aria-hidden="true">
+            <defs>
+              <clipPath id="cupClip"><rect x="10" y="8" width="76" height="104" rx="17"/></clipPath>
+              <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#D3ECF2"/>
+                <stop offset="100%" stop-color="#9CC9D9"/>
+              </linearGradient>
+            </defs>
+            <g clip-path="url(#cupClip)">
+              <rect x="0" y="0" width="96" height="120" fill="#F7FCFD"/>
+              <g class="water-group" id="waterGroup" style="transform:translateY(104px)">
+                <path class="wave" d="M-40 8 q 12 -6 24 0 t 24 0 t 24 0 t 24 0 t 24 0 t 24 0 t 24 0 t 24 0 V 124 H -40 Z" fill="url(#waterGrad)"/>
+                <rect x="-40" y="16" width="200" height="112" fill="url(#waterGrad)"/>
+              </g>
+            </g>
+            <rect x="10" y="8" width="76" height="104" rx="17" fill="none" stroke="#DCEAE6" stroke-width="2.5"/>
+          </svg>
+          <div class="water-figures" data-number-ok>
+            <p class="water-ml"><span class="num" id="waterMl">0</span><span class="u">ml</span></p>
+            <p class="water-cups" id="waterCups">아직 한 모금도 없어요</p>
+            <p class="water-goal">생수 세 병쯤이면 하루가 편해요</p>
+          </div>
+        </div>
+        <div class="water-btns" id="waterBtns" data-number-ok>
+          <button type="button" data-ml="100"><b>+</b><span>한 모금</span><small>100ml</small></button>
+          <button type="button" data-ml="200"><b>+</b><span>한 컵</span><small>200ml</small></button>
+          <button type="button" data-ml="300"><b>+</b><span>반 병</span><small>300ml</small></button>
+          <button type="button" data-ml="500"><b>+</b><span>한 병</span><small>500ml</small></button>
+        </div>
+        <div class="water-foot">
+          <p class="water-msg" id="waterMsg" aria-live="polite"></p>
+          <button type="button" class="link-btn" id="waterUndo" disabled>되돌리기</button>
+        </div>
+      </div>
+
+      <div class="card activity-card">
+        <div class="seg" id="activitySeg" role="group" aria-label="오늘 활동량">
+          <button type="button" data-activity="usual" aria-pressed="true">평소 같은 날</button>
+          <button type="button" data-activity="active" aria-pressed="false"><span class="em">🚶</span>많이 움직인 날</button>
+        </div>
+      </div>
+
+      <div class="card suggest">
+        <div class="suggest-top">
+          <span class="ic">🌿</span>
+          <p class="eyebrow">포근한 제안</p>
+        </div>
+        <p class="suggest-main" id="suggestMain">오늘 첫 끼를 기다리고 있어요</p>
+        <p class="suggest-aside" id="suggestAside">먹은 걸 남겨 주시면, 남은 하루에 맞춰 가볍게 제안해 드릴게요.</p>
+      </div>
+
+      <div class="card">
+        <h3>무엇을 드셨어요?</h3>
+        <div class="slots" id="slotPicker" role="group" aria-label="끼니">
+          <button type="button" data-slot="아침" aria-pressed="false">아침</button>
+          <button type="button" data-slot="점심" aria-pressed="false">점심</button>
+          <button type="button" data-slot="저녁" aria-pressed="false">저녁</button>
+          <button type="button" data-slot="간식" aria-pressed="false">간식</button>
+        </div>
+
+        <div class="group">
+          <p class="group-label">밥 · 국</p>
+          <div class="chips">
+            <button type="button" class="chip" data-food="밥 반 공기">밥 반 공기</button>
+            <button type="button" class="chip" data-food="밥 한 공기">밥 한 공기</button>
+            <button type="button" class="chip" data-food="일반 백반">일반 백반</button>
+            <button type="button" class="chip" data-food="미역국">미역국</button>
+            <button type="button" class="chip" data-food="미역국밥">미역국밥</button>
+            <button type="button" class="chip" data-food="소머리곰탕">소머리곰탕</button>
+            <button type="button" class="chip" data-food="설렁탕">설렁탕</button>
+            <button type="button" class="chip" data-food="순두부">순두부</button>
+            <button type="button" class="chip" data-food="죽">죽</button>
+            <button type="button" class="chip" data-food="김치">김치</button>
+          </div>
+        </div>
+
+        <div class="group">
+          <p class="group-label">면 · 한 그릇</p>
+          <div class="chips">
+            <button type="button" class="chip" data-food="김밥">김밥</button>
+            <button type="button" class="chip" data-food="우동">우동</button>
+            <button type="button" class="chip" data-food="짬뽕">짬뽕</button>
+            <button type="button" class="chip" data-food="컵라면">컵라면</button>
+            <button type="button" class="chip" data-food="면류">면류</button>
+            <button type="button" class="chip" data-food="닭가슴살 볶음밥">닭가슴살 볶음밥</button>
+          </div>
+        </div>
+
+        <div class="group">
+          <p class="group-label">반찬 · 단백질</p>
+          <div class="chips">
+            <button type="button" class="chip" data-food="두부·야채찜">두부·야채찜</button>
+            <button type="button" class="chip" data-food="대패삼겹살">대패삼겹살</button>
+            <button type="button" class="chip" data-food="닭가슴살">닭가슴살</button>
+            <button type="button" class="chip" data-food="나물·야채">나물·야채</button>
+            <button type="button" class="chip" data-food="간식소시지">간식소시지</button>
+          </div>
+        </div>
+
+        <div class="group">
+          <p class="group-label">빵 · 간식</p>
+          <div class="chips">
+            <button type="button" class="chip" data-food="식빵">식빵</button>
+            <button type="button" class="chip" data-food="소금빵">소금빵</button>
+            <button type="button" class="chip" data-food="베이글">베이글</button>
+            <button type="button" class="chip" data-food="카스텔라">카스텔라</button>
+            <button type="button" class="chip" data-food="에너지바">에너지바</button>
+          </div>
+        </div>
+
+        <div class="group">
+          <p class="group-label">과일 · 음료</p>
+          <div class="chips">
+            <button type="button" class="chip" data-food="사과">사과</button>
+            <button type="button" class="chip" data-food="두유">두유</button>
+            <button type="button" class="chip" data-food="라떼">라떼</button>
+            <button type="button" class="chip" data-food="커피">커피</button>
+          </div>
+        </div>
+
+        <div class="custom-row">
+          <input id="customMenu" type="text" maxlength="30" placeholder="직접 적어 보기 (예: 엄마가 끓인 미역국)" aria-label="메뉴 직접 입력">
+          <button type="button" id="customAdd">담기</button>
+        </div>
+
+        <p class="selected-name" id="selectedName">아직 고른 메뉴가 없어요</p>
+
+        <p class="mini-label">양은 어느 정도였나요?</p>
+        <div class="portion-row" id="portionRow" role="group" aria-label="양">
+          <button type="button" data-portion="light" aria-pressed="false">가볍게</button>
+          <button type="button" data-portion="normal" aria-pressed="true">보통</button>
+          <button type="button" data-portion="hearty" aria-pressed="false">든든하게</button>
+        </div>
+
+        <p class="mini-label">식후 속은 어땠어요? (안 골라도 괜찮아요)</p>
+        <div class="tummy-row" id="tummyRow" role="group" aria-label="식후 속 상태">
+          <button type="button" data-tummy="속 편해요" aria-pressed="false">속 편해요</button>
+          <button type="button" data-tummy="살짝 더부룩" aria-pressed="false">살짝 더부룩</button>
+          <button type="button" data-tummy="체한 느낌" aria-pressed="false">체한 느낌</button>
+        </div>
+
+        <button type="button" class="btn primary save-btn" id="saveMeal">기록하기</button>
+        <p class="save-msg" id="saveMsg" aria-live="polite"></p>
+      </div>
+
+      <div class="card">
+        <h3>오늘 남긴 기록</h3>
+        <ul class="meal-list" id="mealList"></ul>
+        <p class="empty-note" id="mealEmpty">아직 기록이 없어요. 방금 드신 것부터 하나만 남겨 볼까요?</p>
+      </div>
+    </section>
+
+    <!-- ================= 나의 기록 ================= -->
+    <section class="tab-panel hidden" id="panel-week" role="tabpanel" aria-labelledby="tab-week">
+      <div class="card week-summary">
+        <div class="suggest-top">
+          <span class="ic">🌱</span>
+          <p class="eyebrow">최근 한 주</p>
+        </div>
+        <p class="sum-main" id="weekMain">이번 주도 천천히 쌓아 볼게요</p>
+        <p class="sum-sub" id="weekSub">기록은 이 기기 안에만 조용히 저장돼요.</p>
+      </div>
+
+      <div class="week-list" id="weekList"></div>
+
+      <div class="legend">
+        <span><span class="dot calm" style="width:8px;height:8px;border-radius:50%;background:#A9C6A4;display:inline-block;"></span>속이 편안했어요</span>
+        <span><span style="width:8px;height:8px;border-radius:50%;background:#E2C89B;display:inline-block;"></span>살짝 더부룩</span>
+        <span><span style="width:8px;height:8px;border-radius:50%;background:#DFB49C;display:inline-block;"></span>조금 무거웠어요</span>
+      </div>
+      <p class="privacy-note">🌿 모든 기록은 윤서 님의 이 기기 브라우저 안에만 남아요.<br>어디로도 보내지 않아요.</p>
+    </section>
+  </main>
+
+  <nav class="tabbar" role="tablist" aria-label="화면 선택">
+    <button type="button" role="tab" id="tab-chew" aria-selected="true" aria-controls="panel-chew">
+      <span class="ic">🥄</span><span>천천히 씹기</span>
+    </button>
+    <button type="button" role="tab" id="tab-meal" aria-selected="false" aria-controls="panel-meal">
+      <span class="ic">🍚</span><span>오늘 식사</span>
+    </button>
+    <button type="button" role="tab" id="tab-week" aria-selected="false" aria-controls="panel-week">
+      <span class="ic">🌿</span><span>나의 기록</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ==== ENGINE:START ==== */
+  // Hidden nutrition reference. These values never reach the screen.
+  var NUTRITION = {
+    '밥 반 공기':       { k: 150, c: 33, p: 3,  f: 1 },
+    '밥 한 공기':       { k: 300, c: 66, p: 6,  f: 1 },
+    '일반 백반':        { k: 600, c: 85, p: 25, f: 15 },
+    '미역국':           { k: 60,  c: 5,  p: 5,  f: 2 },
+    '미역국밥':         { k: 380, c: 68, p: 12, f: 5 },
+    '소머리곰탕':       { k: 350, c: 10, p: 30, f: 20 },
+    '설렁탕':           { k: 380, c: 12, p: 30, f: 22 },
+    '순두부':           { k: 250, c: 12, p: 16, f: 14 },
+    '죽':               { k: 300, c: 55, p: 8,  f: 4 },
+    '김치':             { k: 20,  c: 3,  p: 1,  f: 0 },
+    '김밥':             { k: 480, c: 75, p: 15, f: 12 },
+    '우동':             { k: 420, c: 72, p: 12, f: 8 },
+    '짬뽕':             { k: 650, c: 85, p: 25, f: 20 },
+    '컵라면':           { k: 400, c: 55, p: 8,  f: 16 },
+    '면류':             { k: 450, c: 75, p: 12, f: 10 },
+    '닭가슴살 볶음밥':  { k: 420, c: 58, p: 25, f: 10 },
+    '두부·야채찜':      { k: 220, c: 12, p: 18, f: 11 },
+    '대패삼겹살':       { k: 480, c: 3,  p: 28, f: 40 },
+    '닭가슴살':         { k: 165, c: 0,  p: 31, f: 4 },
+    '나물·야채':        { k: 90,  c: 8,  p: 4,  f: 4 },
+    '간식소시지':       { k: 120, c: 3,  p: 6,  f: 10 },
+    '식빵':             { k: 150, c: 27, p: 4,  f: 2 },
+    '소금빵':           { k: 230, c: 26, p: 5,  f: 12 },
+    '베이글':           { k: 280, c: 50, p: 10, f: 2 },
+    '카스텔라':         { k: 300, c: 42, p: 5,  f: 12 },
+    '에너지바':         { k: 180, c: 24, p: 5,  f: 7 },
+    '사과':             { k: 90,  c: 24, p: 1,  f: 0.3 },
+    '두유':             { k: 120, c: 8,  p: 6,  f: 6 },
+    '라떼':             { k: 180, c: 18, p: 9,  f: 8 },
+    '커피':             { k: 10,  c: 1,  p: 0.5,f: 0 }
+  };
+
+  var TARGETS = {
+    usual:  { k: 1500, c: 195, p: 55, f: 50 },
+    active: { k: 1700, c: 225, p: 60, f: 55 }
+  };
+
+  var PORTION = {
+    light:  { label: '가볍게',   mult: 0.7 },
+    normal: { label: '보통',     mult: 1.0 },
+    hearty: { label: '든든하게', mult: 1.3 }
+  };
+
+  var KEYWORD_NUTRITION = [
+    { re: /(김밥|볶음밥|비빔밥|덮밥|주먹밥)/, v: { k: 460, c: 68, p: 16, f: 13 } },
+    { re: /(떡|죽)/,                          v: { k: 320, c: 60, p: 8,  f: 4 } },
+    { re: /(국|탕|찌개|스프)/,                v: { k: 240, c: 14, p: 17, f: 13 } },
+    { re: /(면|우동|라면|짬뽕|칼국수|파스타|국수)/, v: { k: 450, c: 72, p: 14, f: 12 } },
+    { re: /(빵|베이글|토스트|케이크|카스텔라|과자|쿠키)/, v: { k: 270, c: 40, p: 6, f: 11 } },
+    { re: /(사과|과일|바나나|귤|딸기|포도|복숭아)/, v: { k: 100, c: 24, p: 1, f: 0.3 } },
+    { re: /(고기|삼겹|소고기|닭|돼지|갈비|곰탕|설렁탕|스테이크)/, v: { k: 420, c: 8, p: 30, f: 30 } },
+    { re: /(두부|콩|야채|나물|찜|샐러드)/,    v: { k: 200, c: 12, p: 15, f: 10 } },
+    { re: /(밥|백반|정식)/,                   v: { k: 520, c: 78, p: 20, f: 13 } },
+    { re: /(커피|라떼|차|두유|우유|주스|음료)/, v: { k: 130, c: 13, p: 5, f: 5 } }
+  ];
+  var FALLBACK_NUTRITION = { k: 350, c: 45, p: 14, f: 12 };
+
+  function foodNutrition(name) {
+    if (NUTRITION[name]) return NUTRITION[name];
+    for (var i = 0; i < KEYWORD_NUTRITION.length; i++) {
+      if (KEYWORD_NUTRITION[i].re.test(name)) return KEYWORD_NUTRITION[i].v;
+    }
+    return FALLBACK_NUTRITION;
+  }
+
+  function dayTotals(day) {
+    var total = { k: 0, c: 0, p: 0, f: 0 };
+    var meals = (day && day.meals) || [];
+    for (var i = 0; i < meals.length; i++) {
+      var m = meals[i];
+      var base = foodNutrition(m.name);
+      var mult = (PORTION[m.portion] ? PORTION[m.portion].mult : 1);
+      total.k += base.k * mult;
+      total.c += base.c * mult;
+      total.p += base.p * mult;
+      total.f += base.f * mult;
+    }
+    return total;
+  }
+
+  function hashKey(key) {
+    var h = 7;
+    for (var i = 0; i < String(key).length; i++) {
+      h = (h * 31 + String(key).charCodeAt(i)) % 9973;
+    }
+    return h;
+  }
+
+  function lastMeal(day) {
+    var meals = (day && day.meals) || [];
+    return meals.length ? meals[meals.length - 1] : null;
+  }
+
+  function tummySummary(day) {
+    var meals = (day && day.meals) || [];
+    var hasHeavy = false, hasMid = false, hasCalm = false;
+    for (var i = 0; i < meals.length; i++) {
+      if (meals[i].tummy === '체한 느낌') hasHeavy = true;
+      else if (meals[i].tummy === '살짝 더부룩') hasMid = true;
+      else if (meals[i].tummy === '속 편해요') hasCalm = true;
+    }
+    if (hasHeavy) return '체한 느낌';
+    if (hasMid) return '살짝 더부룩';
+    if (hasCalm) return '속 편해요';
+    return '';
+  }
+
+  // The hidden guide. Returns only gentle Korean wording — never a number.
+  function buildSuggestion(day, now) {
+    var target = TARGETS[day && day.activity === 'active' ? 'active' : 'usual'];
+    var totals = dayTotals(day);
+    var hour = now.getHours();
+    var active = !!(day && day.activity === 'active');
+    var meals = (day && day.meals) || [];
+    var ratio = target.k > 0 ? totals.k / target.k : 0;
+    var last = lastMeal(day);
+    var lastFeel = last ? last.tummy : '';
+    var lowCarb = totals.c < target.c * 0.5;
+    var lowProtein = totals.p < target.p * 0.5;
+    var proteinNote = '단백질은 두부 한 접시나 두유 한 잔으로 가볍게 채워 두면 좋아요.';
+    var carbNote = '탄수화물(밥·빵·과일)을 평소보다 조금 더 챙겨야 밤에 허기가 안 터져요.';
+
+    if (!meals.length) {
+      if (hour < 10) {
+        return {
+          main: '아침은 아직이네요. 속이 편한 걸로 가볍게 시작해 볼까요?',
+          aside: active
+            ? '오늘 많이 움직이는 날이니 밥 반 공기에 두유 한 잔처럼 조금 든든하게 시작해도 좋아요.'
+            : '식빵 반 쪽에 두유, 또는 밥 반 공기와 미역국 같은 조합이 속을 편하게 해 줘요.'
+        };
+      }
+      if (hour < 16) {
+        return {
+          main: '아직 오늘 첫 끼를 못 챙기셨어요.',
+          aside: '배고픔을 오래 두면 저녁에 급하게 당기기 쉬워요. 지금 부드러운 것부터 조금이라도 챙겨 두면 오후가 훨씬 편해요.'
+        };
+      }
+      return {
+        main: '오늘은 아직 몸을 달래 줄 연료가 들어가지 않았어요.',
+        aside: '미역국밥이나 죽처럼 따뜻하고 부드러운 걸 반 그릇부터 천천히 시작해 볼까요?'
+      };
+    }
+
+    if (lastFeel === '체한 느낌') {
+      return {
+        main: '속이 아직 무거우니까 오늘은 양보다 편안함이 먼저예요.',
+        aside: '따뜻한 물이나 매실차를 조금씩 나눠 마시고, 다음 끼니는 죽이나 맑은 미역국처럼 부드러운 걸로 아주 조금만 시작해요.'
+      };
+    }
+
+    if (lastFeel === '살짝 더부룩') {
+      return {
+        main: '지금은 배가 살짝 무거운 상태예요.',
+        aside: '다음엔 국물이나 야채부터 천천히, 밥은 반 숟가락씩 나눠 드셔 보세요. 무리하지 않아도 괜찮아요.'
+      };
+    }
+
+    if (ratio < 0.3) {
+      if (hour >= 21) {
+        return {
+          main: '오늘은 아직 여유가 꽤 있어요.',
+          aside: '늦은 시간이라도 배가 고프면 죽이나 미역국밥 반 그릇부터 천천히 시작해 보세요. 밥 반 공기까지 드셔도 괜찮아요 — 밤에 굶고 자면 새벽에 더 당겨요.'
+        };
+      }
+      return {
+        main: active ? '오늘 많이 움직이셨어요! 아직 여유가 꽤 있어요.' : '아직 여유가 꽤 있어요.',
+        aside: active
+          ? '밥 반 공기에서 조금 더 넉넉하게, 따뜻한 반찬과 과일 한 조각까지 챙겨 보세요. ' + carbNote
+          : '밥 반 공기에서 조금 더 넉넉하게, 따뜻한 반찬 챙겨 드세요.' + (lowCarb ? ' 빵이나 과일도 한 조각 곁들이면 좋아요.' : '')
+      };
+    }
+
+    if (ratio < 0.72) {
+      if (hour >= 21) {
+        return {
+          main: '지금까지 딱 알맞게 잘 드셨어요!',
+          aside: '늦은 시간이니 두부·야채에 따뜻한 국물을 곁들여 조금은 든든하게 마무리해요. 배가 고프면 밥 반 공기도 그냥 드셔도 괜찮아요.'
+        };
+      }
+      return {
+        main: '지금까지 딱 알맞게 잘 드셨어요!',
+        aside: (hour < 15
+          ? '점심엔 밥 반 공기와 따뜻한 국물, 단백질 반찬 한 가지로 채워 보세요.'
+          : '저녁엔 두부·야채·맑은 국처럼 가볍고 속 편한 걸로 마무리해 볼까요?')
+          + (active ? ' 오늘 많이 움직였으니 밥은 평소보다 조금 넉넉하게 잡아도 괜찮아요.' : '')
+          + (lowProtein ? ' ' + proteinNote : '')
+      };
+    }
+
+    if (ratio < 1.0) {
+      return {
+        main: '오늘 필요한 만큼 거의 다 채우셨어요.',
+        aside: '남은 끼니는 두부나 따뜻한 국물처럼 부담 없는 걸로 조금만 곁들이면 좋아요.'
+      };
+    }
+
+    return {
+      main: '오늘 필요한 만큼 충분히 든든히 채웠어요.',
+      aside: '이제 따뜻한 차 한 잔으로 속을 편하게 쉬게 해 주세요. 그래도 몸이 원하면 한두 숟가락은 그냥 드셔도 괜찮아요.'
+    };
+  }
+
+  function weekSummary(days) {
+    var withMeals = [], calm = 0, chewDays = 0, waterDays = 0;
+    for (var i = 0; i < days.length; i++) {
+      var d = days[i];
+      if (d && d.meals && d.meals.length) {
+        withMeals.push(d);
+        if (tummySummary(d) === '속 편해요') calm += 1;
+      }
+      if (d && d.bites > 0) chewDays += 1;
+      if (d && d.water > 0) waterDays += 1;
+    }
+    if (!withMeals.length) {
+      return {
+        main: '이번 주는 아직 남긴 기록이 적어요.',
+        sub: '오늘 한 끼부터 편하게 남겨 볼까요? 기록은 재촉하지 않을게요.'
+      };
+    }
+    var main = calm >= Math.ceil(withMeals.length / 2)
+      ? '이번 주는 속이 편안했던 날이 더 많았어요. 그 흐름 그대로 천천히 가요.'
+      : '더부룩하거나 무거웠던 날도 있었지만, 그런 날까지 남기신 것만으로 충분해요.';
+    var subParts = [];
+    if (chewDays > 0) subParts.push('천천히 씹기도 스스로 켜서 해 보셨어요.');
+    else subParts.push('한 입 타이머는 다음 끼니에 한 번만 켜 봐도 좋아요.');
+    if (waterDays > 0) subParts.push('물도 조금씩 나눠 마신 날이 있었어요.');
+    return { main: main, sub: subParts.join(' ') };
+  }
+
+  function formatCups(ml) {
+    var cups = ml / 200;
+    var rounded = Math.round(cups * 2) / 2;
+    if (rounded <= 0) return '';
+    var text = (rounded % 1 === 0) ? String(rounded) : rounded.toFixed(1);
+    return text + '잔';
+  }
+  /* ==== ENGINE:END ==== */
+
+  /* ---------- storage ---------- */
+  var STORE_KEY = 'intuitive-meal-app.v1';
+  var CHEW_SECONDS = [20, 25, 30, 40];
+
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+
+  function dateKey(d) {
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
+  function emptyDay(key) {
+    return {
+      key: key,
+      activity: 'usual',
+      meals: [],
+      bites: 0,
+      feels: [],
+      water: 0,
+      waterLog: []
+    };
+  }
+
+  var state = null;
+
+  function loadState() {
+    var raw = null;
+    try { raw = window.localStorage.getItem(STORE_KEY); } catch (e) { raw = null; }
+    var parsed = null;
+    if (raw) {
+      try { parsed = JSON.parse(raw); } catch (e) { parsed = null; }
+    }
+    if (!parsed || typeof parsed !== 'object') parsed = {};
+    if (!parsed.days || typeof parsed.days !== 'object') parsed.days = {};
+    Object.keys(parsed.days).forEach(function (k) {
+      var d = parsed.days[k];
+      if (!d || typeof d !== 'object') { parsed.days[k] = emptyDay(k); return; }
+      if (!Array.isArray(d.meals)) d.meals = [];
+      if (!Array.isArray(d.feels)) d.feels = [];
+      if (!Array.isArray(d.waterLog)) d.waterLog = [];
+      if (typeof d.bites !== 'number' || !isFinite(d.bites)) d.bites = 0;
+      if (typeof d.water !== 'number' || !isFinite(d.water)) d.water = 0;
+      if (d.activity !== 'active') d.activity = 'usual';
+      d.key = k;
+    });
+    if (!parsed.settings || typeof parsed.settings !== 'object') parsed.settings = {};
+    if (CHEW_SECONDS.indexOf(parsed.settings.sec) < 0) parsed.settings.sec = 25;
+    if (typeof parsed.settings.sound !== 'boolean') parsed.settings.sound = true;
+    return parsed;
+  }
+
+  function saveState() {
+    try { window.localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+    catch (e) { /* private mode or full storage — keep the session working */ }
+  }
+
+  function today() {
+    var key = dateKey(new Date());
+    if (!state.days[key]) state.days[key] = emptyDay(key);
+    return state.days[key];
+  }
+
+  function pruneDays() {
+    var keys = Object.keys(state.days);
+    if (keys.length <= 120) return;
+    keys.sort();
+    for (var i = 0; i < keys.length - 120; i++) delete state.days[keys[i]];
+  }
+
+  /* ---------- helpers ---------- */
+  function $(id) { return document.getElementById(id); }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (ch) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+  }
+
+  function weekdayKo(d) {
+    return ['일', '월', '화', '수', '목', '금', '토'][d.getDay()];
+  }
+
+  function greetingFor(hour) {
+    if (hour < 5) return { title: '늦은 밤이에요', sub: '천천히 씹고, 따뜻하게 쉬어요' };
+    if (hour < 11) return { title: '좋은 아침이에요', sub: '천천히 씹고, 가볍게 남겨요' };
+    if (hour < 15) return { title: '점심 시간이에요', sub: '한 입씩 천천히, 속이 편하게' };
+    if (hour < 18) return { title: '좋은 오후예요', sub: '출출하면 부드러운 것부터' };
+    if (hour < 22) return { title: '좋은 저녁이에요', sub: '오늘도 잘 챙기셨어요' };
+    return { title: '오늘도 수고했어요', sub: '따뜻한 차 한 잔으로 마무리' };
+  }
+
+  function slotFor(hour) {
+    if (hour < 11) return '아침';
+    if (hour < 15) return '점심';
+    if (hour < 18) return '간식';
+    return '저녁';
+  }
+
+  /* ---------- app form state ---------- */
+  var draft = { slot: '', name: '', portion: 'normal', tummy: '' };
+
+  /* ---------- audio ---------- */
+  var audioCtx = null;
+  var audioUnlocked = false;
+
+  function ensureAudio() {
+    if (audioCtx) return audioCtx;
+    var Ctor = window.AudioContext || window.webkitAudioContext;
+    if (!Ctor) return null;
+    try { audioCtx = new Ctor(); } catch (e) { audioCtx = null; }
+    return audioCtx;
+  }
+
+  function unlockAudio() {
+    var ctx = ensureAudio();
+    if (!ctx) return;
+    try {
+      if (ctx.state === 'suspended') ctx.resume();
+      var o = ctx.createOscillator();
+      var g = ctx.createGain();
+      g.gain.value = 0.0001;
+      o.connect(g); g.connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime + 0.02);
+      audioUnlocked = true;
+    } catch (e) { /* ignore */ }
+  }
+
+  function playBell() {
+    if (!state.settings.sound) return;
+    var ctx = ensureAudio();
+    if (!ctx) return;
+    try {
+      if (ctx.state === 'suspended') ctx.resume();
+      var now = ctx.currentTime + 0.02;
+      var tones = [
+        { f: 880, t: 0,    d: 2.4, g: 0.10 },
+        { f: 1318.5, t: 0.18, d: 2.0, g: 0.055 },
+        { f: 659.3, t: 0.02, d: 2.6, g: 0.035 }
+      ];
+      for (var i = 0; i < tones.length; i++) {
+        var t = tones[i];
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(t.f, now + t.t);
+        gain.gain.setValueAtTime(0.0001, now + t.t);
+        gain.gain.exponentialRampToValueAtTime(t.g, now + t.t + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + t.t + t.d);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now + t.t); osc.stop(now + t.t + t.d + 0.05);
+      }
+      if (navigator.vibrate) { try { navigator.vibrate(18); } catch (e) {} }
+    } catch (e) { /* ignore */ }
+  }
+
+  /* ---------- timer ---------- */
+  var timer = { running: false, paused: false, endAt: 0, remaining: 0, raf: 0, restoreTimer: 0 };
+  var RING_C = 2 * Math.PI * 104;
+
+  function setText(el, text) {
+    if (el && el.textContent !== text) el.textContent = text;
+  }
+
+  function totalMs() { return state.settings.sec * 1000; }
+
+  function paintTimer(remainingMs) {
+    var total = totalMs();
+    var ratio = total > 0 ? Math.max(0, Math.min(1, remainingMs / total)) : 1;
+    $('ringProg').style.strokeDashoffset = String(RING_C * (1 - ratio));
+    var secs = Math.ceil(remainingMs / 1000);
+    setText($('timerCount'), secs > 0 ? String(secs) : '✓');
+    setText($('timerUnit'), secs > 0 ? '초' : '');
+    var msg = $('timerMsg');
+    if (remainingMs > 5000) {
+      setText(msg, '천천히 꼭꼭 씹고 있어요');
+      msg.classList.remove('done');
+    } else if (remainingMs > 0) {
+      setText(msg, '삼키고 잠시 젓가락 내려놓기');
+      msg.classList.remove('done');
+    }
+  }
+
+  function timerLoop() {
+    if (!timer.running) return;
+    var left = Math.max(0, timer.endAt - performance.now());
+    timer.remaining = left;
+    paintTimer(left);
+    if (left <= 0) { completeBite(); return; }
+    timer.raf = requestAnimationFrame(timerLoop);
+  }
+
+  function startTimer() {
+    unlockAudio();
+    var from = timer.paused && timer.remaining > 0 ? timer.remaining : totalMs();
+    timer.endAt = performance.now() + from;
+    timer.remaining = from;
+    timer.running = true;
+    timer.paused = false;
+    $('ringWrap').classList.add('running');
+    $('timerBtn').textContent = '멈춤';
+    $('resetBtn').hidden = true;
+    clearTimeout(timer.restoreTimer);
+    paintTimer(from);
+    kickTimer();
+  }
+
+  // One pending frame only: re-entering never stacks a second loop.
+  function kickTimer() {
+    cancelAnimationFrame(timer.raf);
+    timer.raf = requestAnimationFrame(timerLoop);
+  }
+
+  function pauseTimer() {
+    timer.running = false;
+    cancelAnimationFrame(timer.raf);
+    $('ringWrap').classList.remove('running');
+    timer.paused = true;
+    timer.remaining = Math.max(0, timer.endAt - performance.now());
+    $('timerBtn').textContent = '이어서';
+    $('resetBtn').hidden = false;
+    $('timerMsg').textContent = '잠깐 쉬어 가도 괜찮아요. 이어서 눌러 주세요.';
+  }
+
+  function resetTimer() {
+    timer.running = false;
+    timer.paused = false;
+    cancelAnimationFrame(timer.raf);
+    $('ringWrap').classList.remove('running');
+    timer.remaining = totalMs();
+    $('timerBtn').textContent = '시작';
+    $('resetBtn').hidden = true;
+    paintTimer(totalMs());
+    $('timerMsg').textContent = '준비되면 시작을 눌러 주세요';
+    $('timerMsg').classList.remove('done');
+  }
+
+  function completeBite() {
+    timer.running = false;
+    timer.paused = false;
+    cancelAnimationFrame(timer.raf);
+    var day = today();
+    day.bites += 1;
+    saveState();
+    renderChewCount();
+    playBell();
+    $('ringWrap').classList.remove('running');
+    $('ringProg').style.strokeDashoffset = '0';
+    $('timerCount').textContent = '🌿';
+    $('timerUnit').textContent = '';
+    $('timerMsg').textContent = '한 입 잘 씹었어요. 잠시 숨 고르고 다음 한 입으로.';
+    $('timerMsg').classList.add('done');
+    $('timerBtn').textContent = '다음 한 입';
+    $('resetBtn').hidden = true;
+    timer.remaining = 0;
+    timer.paused = false;
+    clearTimeout(timer.restoreTimer);
+    timer.restoreTimer = setTimeout(function () {
+      if (timer.running) return;
+      $('timerCount').textContent = String(state.settings.sec);
+      $('timerUnit').textContent = '초';
+      $('timerMsg').textContent = '다음 한 입도 천천히 시작해요';
+      $('timerMsg').classList.remove('done');
+      $('timerBtn').textContent = '시작';
+      $('ringProg').style.strokeDashoffset = '0';
+    }, 2600);
+    renderWeek();
+  }
+
+  function renderChewOptions() {
+    var buttons = $('chewOptions').querySelectorAll('button');
+    for (var i = 0; i < buttons.length; i++) {
+      var on = Number(buttons[i].getAttribute('data-sec')) === state.settings.sec;
+      buttons[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+  }
+
+  function renderChewCount() {
+    var day = today();
+    $('biteCount').textContent = String(day.bites || 0);
+  }
+
+  function renderSoundToggle() {
+    var btn = $('soundToggle');
+    var on = state.settings.sound;
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    btn.textContent = on ? '🔔 종소리 켜짐' : '🔕 종소리 꺼짐';
+  }
+
+  /* ---------- water ---------- */
+  var waterMsgTimer = 0;
+
+  function renderWater() {
+    var day = today();
+    var ml = day.water || 0;
+    $('waterMl').textContent = String(ml);
+    var cups = formatCups(ml);
+    $('waterCups').textContent = cups ? ('한 컵씩 세면 ' + cups + '쯤') : '아직 한 모금도 없어요';
+    var pct = Math.min(1, ml / 1500);
+    var group = $('waterGroup');
+    group.style.transform = 'translateY(' + (104 - 104 * pct).toFixed(2) + 'px)';
+    $('waterUndo').disabled = !(day.waterLog && day.waterLog.length);
+    var hint = $('waterHint');
+    if (ml <= 0) hint.textContent = '한 모금부터 편하게';
+    else if (ml < 1500) hint.textContent = '조금씩 나눠 마시면 속이 편해요';
+    else hint.textContent = '오늘은 충분히 채우셨어요';
+  }
+
+  function addWater(amount) {
+    var day = today();
+    day.water = Math.max(0, (day.water || 0) + amount);
+    if (!day.waterLog) day.waterLog = [];
+    day.waterLog.push(amount);
+    if (day.water === 0) day.waterLog = [];
+    saveState();
+    renderWater();
+    var msg = $('waterMsg');
+    var lines = {
+      100: '한 모금 잘 넘기셨어요.',
+      200: '물 한 컵 채웠어요. 속이 한결 가벼워질 거예요.',
+      300: '반 병이나 채우셨네요. 좋아요!',
+      500: '한 병 통째로, 시원하게 잘 드셨어요.'
+    };
+    msg.textContent = lines[amount] || '물 잘 챙기셨어요.';
+    if ((day.water || 0) >= 1500 && (day.water - amount) < 1500) {
+      msg.textContent = '오늘 물은 충분히 채우셨어요. 이제 편하게 한 모금씩만 이어가요.';
+    }
+    clearTimeout(waterMsgTimer);
+    waterMsgTimer = setTimeout(function () { msg.textContent = ''; }, 4200);
+    if (amount >= 300) { unlockAudio(); }
+  }
+
+  function undoWater() {
+    var day = today();
+    if (!day.waterLog || !day.waterLog.length) return;
+    var last = day.waterLog.pop();
+    day.water = Math.max(0, (day.water || 0) - last);
+    if (day.water === 0) day.waterLog = [];
+    saveState();
+    renderWater();
+    var msg = $('waterMsg');
+    msg.textContent = '방금 기록 하나를 되돌렸어요.';
+    clearTimeout(waterMsgTimer);
+    waterMsgTimer = setTimeout(function () { msg.textContent = ''; }, 3200);
+  }
+
+  /* ---------- meals ---------- */
+  function currentMeals() { return today().meals; }
+
+  function renderSlots() {
+    var buttons = $('slotPicker').querySelectorAll('button');
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute('aria-pressed', buttons[i].getAttribute('data-slot') === draft.slot ? 'true' : 'false');
+    }
+  }
+
+  function renderPortion() {
+    var buttons = $('portionRow').querySelectorAll('button');
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute('aria-pressed', buttons[i].getAttribute('data-portion') === draft.portion ? 'true' : 'false');
+    }
+  }
+
+  function renderTummy() {
+    var buttons = $('tummyRow').querySelectorAll('button');
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute('aria-pressed', buttons[i].getAttribute('data-tummy') === draft.tummy ? 'true' : 'false');
+    }
+  }
+
+  function renderChips() {
+    var chips = document.querySelectorAll('.chip');
+    for (var i = 0; i < chips.length; i++) {
+      chips[i].setAttribute('aria-pressed', chips[i].getAttribute('data-food') === draft.name ? 'true' : 'false');
+    }
+  }
+
+  function renderSelected() {
+    var el = $('selectedName');
+    if (!draft.name) {
+      el.textContent = '아직 고른 메뉴가 없어요';
+      return;
+    }
+    el.innerHTML = '고른 메뉴: <b>' + escapeHtml(draft.name) + '</b>';
+  }
+
+  function renderMealList() {
+    var meals = currentMeals();
+    var list = $('mealList');
+    var html = '';
+    for (var i = 0; i < meals.length; i++) {
+      var m = meals[i];
+      var meta = [PORTION[m.portion] ? PORTION[m.portion].label : '보통'];
+      if (m.tummy) meta.push(m.tummy);
+      html += '<li class="meal-item">'
+        + '<span class="slot-badge">' + escapeHtml(m.slot) + '</span>'
+        + '<div class="meal-main">'
+        + '<p class="meal-name">' + escapeHtml(m.name) + '</p>'
+        + '<p class="meal-meta">' + escapeHtml(meta.join(' · ')) + '</p>'
+        + '</div>'
+        + '<button type="button" class="del" data-id="' + escapeHtml(m.id) + '" aria-label="' + escapeHtml(m.name) + ' 기록 지우기">×</button>'
+        + '</li>';
+    }
+    list.innerHTML = html;
+    $('mealEmpty').hidden = meals.length > 0;
+  }
+
+  function renderSuggestion() {
+    var s = buildSuggestion(today(), new Date());
+    $('suggestMain').textContent = s.main;
+    $('suggestAside').textContent = s.aside;
+  }
+
+  function renderActivity() {
+    var buttons = $('activitySeg').querySelectorAll('button');
+    var active = today().activity === 'active';
+    for (var i = 0; i < buttons.length; i++) {
+      var isActive = buttons[i].getAttribute('data-activity') === 'active';
+      buttons[i].setAttribute('aria-pressed', (isActive === active) ? 'true' : 'false');
+    }
+  }
+
+  /* ---------- week ---------- */
+  function renderWeek() {
+    var days = [];
+    var now = new Date();
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      var key = dateKey(d);
+      var stored = state.days[key] || emptyDay(key);
+      days.push({ date: d, day: stored });
+    }
+
+    var list = $('weekList');
+    var html = '';
+    for (var j = 0; j < days.length; j++) {
+      var item = days[j];
+      var day = item.day;
+      var isToday = j === days.length - 1;
+      var tummy = tummySummary(day);
+      var tummyLabel = tummy === '속 편해요' ? '속이 편안했어요'
+        : tummy === '살짝 더부룩' ? '살짝 더부룩했어요'
+        : tummy === '체한 느낌' ? '조금 무거웠어요'
+        : (day.meals && day.meals.length ? '속 기록은 없어요' : '기록 없음');
+      var dotClass = tummy === '속 편해요' ? 'calm' : tummy === '살짝 더부룩' ? 'mid' : tummy === '체한 느낌' ? 'heavy' : 'none';
+      var dayLabel = isToday ? '오늘' : (j === days.length - 2 ? '어제' : '');
+      var waterText = (day.water > 0) ? ('물 ' + day.water + 'ml') : '';
+      var waterHtml = waterText ? ('<p class="day-water" data-number-ok>' + waterText + '</p>') : '';
+      var chewOn = day.bites > 0;
+      var activeOn = day.activity === 'active';
+
+      html += '<div class="day-row' + (isToday ? ' today' : '') + '">'
+        + '<div class="day-name"><b>' + weekdayKo(item.date) + '</b><span>' + (dayLabel || '&nbsp;') + '</span></div>'
+        + '<div class="day-mid">'
+        + '<p class="day-tummy"><span class="dot ' + dotClass + '"></span>' + tummyLabel + '</p>'
+        + waterHtml
+        + '</div>'
+        + '<div class="day-icons">'
+        + '<span class="ic ' + (chewOn ? 'on' : 'dim') + '" title="천천히 씹기">🥄</span>'
+        + '<span class="ic ' + (activeOn ? 'on' : 'dim') + '" title="활동량">🚶</span>'
+        + '</div>'
+        + '</div>';
+    }
+    list.innerHTML = html;
+
+    var summary = weekSummary(days.map(function (d) { return d.day; }));
+    $('weekMain').textContent = summary.main;
+    $('weekSub').textContent = summary.sub;
+  }
+
+  /* ---------- render all ---------- */
+  function renderAll() {
+    renderChewOptions();
+    renderChewCount();
+    renderSoundToggle();
+    renderWater();
+    renderActivity();
+    renderSuggestion();
+    renderSlots();
+    renderChips();
+    renderPortion();
+    renderTummy();
+    renderSelected();
+    renderMealList();
+    renderWeek();
+  }
+
+  /* ---------- events ---------- */
+  function selectTab(tabId) {
+    var tabs = ['chew', 'meal', 'week'];
+    for (var i = 0; i < tabs.length; i++) {
+      var isOn = tabs[i] === tabId;
+      var btn = $('tab-' + tabs[i]);
+      var panel = $('panel-' + tabs[i]);
+      btn.setAttribute('aria-selected', isOn ? 'true' : 'false');
+      panel.classList.toggle('hidden', !isOn);
+    }
+    if (tabId === 'meal') { renderSuggestion(); renderMealList(); renderWater(); }
+    if (tabId === 'week') renderWeek();
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+
+  function bindEvents() {
+    $('tab-chew').addEventListener('click', function () { selectTab('chew'); });
+    $('tab-meal').addEventListener('click', function () { selectTab('meal'); });
+    $('tab-week').addEventListener('click', function () { selectTab('week'); });
+
+    $('chewOptions').addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      var sec = Number(btn.getAttribute('data-sec'));
+      if (CHEW_SECONDS.indexOf(sec) < 0) return;
+      state.settings.sec = sec;
+      saveState();
+      renderChewOptions();
+      resetTimer();
+    });
+
+    $('timerBtn').addEventListener('click', function () {
+      if (timer.running) pauseTimer();
+      else startTimer();
+    });
+    $('resetBtn').addEventListener('click', resetTimer);
+
+    $('soundToggle').addEventListener('click', function () {
+      state.settings.sound = !state.settings.sound;
+      saveState();
+      renderSoundToggle();
+      if (state.settings.sound) { unlockAudio(); playBell(); }
+    });
+
+    $('feelGrid').addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      var feel = btn.getAttribute('data-feel');
+      var all = $('feelGrid').querySelectorAll('button');
+      for (var i = 0; i < all.length; i++) {
+        all[i].setAttribute('aria-pressed', all[i] === btn ? 'true' : 'false');
+      }
+      var day = today();
+      day.feels.push({ feel: feel, at: Date.now() });
+      saveState();
+      var msg = $('feelMsg');
+      if (feel === '여유') {
+        msg.textContent = '좋아요, 아직 배가 편안하다는 신호예요. 다음 한 입도 같은 속도로 이어가 볼까요?';
+      } else if (feel === '좋아') {
+        msg.textContent = '딱 좋은 지점이에요! 여기서 잠깐 숨 고르고, 더 먹고 싶은지 몸에 물어봐도 좋아요.';
+      } else {
+        msg.textContent = '잘 알아차리셨어요. 남기셔도 괜찮아요 — 지금 멈추는 게 오늘 속을 제일 편하게 해 줘요. 따뜻한 물 한 모금으로 마무리해요.';
+        resetTimer();
+      }
+      renderWeek();
+    });
+
+    $('waterBtns').addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      var amount = Number(btn.getAttribute('data-ml'));
+      if (!amount) return;
+      addWater(amount);
+      renderWeek();
+    });
+    $('waterUndo').addEventListener('click', function () {
+      undoWater();
+      renderWeek();
+    });
+
+    $('activitySeg').addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      var value = btn.getAttribute('data-activity');
+      var day = today();
+      day.activity = value === 'active' ? 'active' : 'usual';
+      saveState();
+      renderActivity();
+      renderSuggestion();
+      renderWeek();
+    });
+
+    $('slotPicker').addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      draft.slot = btn.getAttribute('data-slot');
+      renderSlots();
+    });
+
+    var chipNodes = document.querySelectorAll('.chip');
+    for (var i = 0; i < chipNodes.length; i++) {
+      chipNodes[i].addEventListener('click', function (e) {
+        var name = e.currentTarget.getAttribute('data-food');
+        draft.name = (draft.name === name) ? '' : name;
+        $('customMenu').value = '';
+        renderChips();
+        renderSelected();
+      });
+    }
+
+    $('customAdd').addEventListener('click', function () {
+      var input = $('customMenu');
+      var value = input.value.trim();
+      if (!value) { input.focus(); return; }
+      draft.name = value;
+      renderChips();
+      renderSelected();
+      $('saveMsg').textContent = '';
+    });
+
+    $('customMenu').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); $('customAdd').click(); }
+    });
+
+    $('portionRow').addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      draft.portion = btn.getAttribute('data-portion');
+      renderPortion();
+    });
+
+    $('tummyRow').addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      var value = btn.getAttribute('data-tummy');
+      draft.tummy = (draft.tummy === value) ? '' : value;
+      renderTummy();
+    });
+
+    $('saveMeal').addEventListener('click', function () {
+      var input = $('customMenu');
+      var typed = input.value.trim();
+      if (typed) { draft.name = typed; renderChips(); }
+      if (!draft.name) {
+        $('saveMsg').textContent = '먹은 메뉴를 하나만 골라 주세요.';
+        return;
+      }
+      var day = today();
+      if (!draft.slot) draft.slot = slotFor(new Date().getHours());
+      day.meals.push({
+        id: 'm' + Date.now() + Math.floor(Math.random() * 1000),
+        name: draft.name,
+        slot: draft.slot,
+        portion: draft.portion,
+        tummy: draft.tummy,
+        at: Date.now()
+      });
+      saveState();
+      renderMealList();
+      renderSuggestion();
+      renderWeek();
+      $('saveMsg').textContent = '잘 남겼어요. ' + draft.name + ' — 다음 한 입은 조금 더 천천히 가 볼까요?';
+      draft.name = '';
+      draft.tummy = '';
+      input.value = '';
+      renderChips();
+      renderSelected();
+      renderTummy();
+      window.setTimeout(function () { $('saveMsg').textContent = ''; }, 5000);
+    });
+
+    $('mealList').addEventListener('click', function (e) {
+      var btn = e.target.closest('.del');
+      if (!btn) return;
+      var id = btn.getAttribute('data-id');
+      var day = today();
+      day.meals = day.meals.filter(function (m) { return m.id !== id; });
+      saveState();
+      renderMealList();
+      renderSuggestion();
+      renderWeek();
+    });
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible' && timer.running) {
+        kickTimer();
+      }
+    });
+  }
+
+  /* ---------- boot ---------- */
+  function boot() {
+    state = loadState();
+    var now = new Date();
+    var greet = greetingFor(now.getHours());
+    $('greeting').textContent = greet.title;
+    $('greetSub').textContent = greet.sub;
+    $('datePill').textContent = (now.getMonth() + 1) + '월 ' + now.getDate() + '일 ' + weekdayKo(now) + '요일';
+
+    draft.slot = slotFor(now.getHours());
+    resetTimer();
+    renderAll();
+    bindEvents();
+
+    document.addEventListener('pointerdown', function once() {
+      unlockAudio();
+      document.removeEventListener('pointerdown', once);
+    }, { once: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+</script>
+</body>
+</html>
