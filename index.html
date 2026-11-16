@@ -948,9 +948,9 @@
     var totals = dayTotals(day);
     var hour = now.getHours();
     var steps = moveSteps(day);
-    var exKcal = moveExerciseKcal(day);
-    // 많이 움직인 날 = 걸음이 평소보다 확실히 많거나, 운동으로 꽤 쓴 날
-    var active = steps >= 9000 || exKcal >= 30;
+    // 많이 움직인 날 = 걸음이 확실히 많거나, 운동으로 유지선이 눈에 띄게 올라간 날
+    // ('오늘 움직임' 카드의 안내 문구와 같은 기준)
+    var active = steps >= 9000 || (target.k - MOVE_BASE_KCAL) >= 60;
     var meals = (day && day.meals) || [];
     var ratio = target.k > 0 ? totals.k / target.k : 0;
     var last = lastMeal(day);
