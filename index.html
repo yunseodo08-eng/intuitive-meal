@@ -577,7 +577,7 @@
         <div class="move-block">
           <p class="move-label"><span class="em">🚶</span>걸음 수</p>
           <div class="num-field">
-            <input id="stepsInput" type="number" inputmode="numeric" min="0" max="50000" step="500" placeholder="6,000" aria-label="오늘 걸음 수">
+            <input id="stepsInput" type="text" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="6,000" aria-label="오늘 걸음 수">
             <span class="suffix">보</span>
           </div>
           <div class="quick-chips" id="stepChips" role="group" aria-label="걸음 수 빠른 선택">
@@ -1598,7 +1598,7 @@
     var steps = day.steps;
 
     if (!keep) {
-      $('stepsInput').value = (typeof steps === 'number') ? String(steps) : '';
+      $('stepsInput').value = (typeof steps === 'number') ? fmtNum(steps) : '';
       $('minInput').value = (typeof day.exerciseMin === 'number') ? String(day.exerciseMin) : '';
       $('burnInput').value = (typeof day.exerciseKcal === 'number') ? String(day.exerciseKcal) : '';
     }
@@ -1808,6 +1808,8 @@
 
     $('stepsInput').addEventListener('input', function () { applySteps(this.value, true); });
     $('stepsInput').addEventListener('change', function () { applySteps(this.value, true); });
+    // 입력이 끝나면 "12,000"처럼 쉼표를 넣어 정리한다
+    $('stepsInput').addEventListener('blur', function () { renderMove(); });
     $('stepChips').addEventListener('click', function (e) {
       var btn = e.target.closest('button');
       if (!btn) return;
