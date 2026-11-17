@@ -209,6 +209,60 @@
   }
   .chew-foot strong{ color:var(--sage-deep); font-weight:700; }
 
+  /* ---------- 한입 씹기 리듬 카운터 ---------- */
+  .rhythm-card{ text-align:center; padding-top:18px; }
+  .rhythm-card .head{ display:flex; align-items:center; justify-content:center; gap:7px; margin-bottom:6px; }
+  .rhythm-card .head .ic{ font-size:16px; }
+  .rhythm-card h2{ margin:0; }
+  .rhythm-card .lead2{ margin:6px 2px 0; font-size:12.5px; line-height:1.55; color:var(--muted); }
+  .rhythm-goal{ margin:14px 0 0; }
+  .rhythm-ring-wrap{ position:relative; width:196px; height:196px; margin:12px auto 2px; }
+  .rhythm-ring{ width:100%; height:100%; display:block; }
+  .rhythm-track{ fill:none; stroke:#F0EADD; stroke-width:10; }
+  .rhythm-halo{
+    fill:rgba(200,222,195,.2); transform-box:fill-box; transform-origin:center; opacity:.4;
+  }
+  .rhythm-prog{
+    fill:none; stroke:url(#rhythmGrad); stroke-width:10; stroke-linecap:round;
+    stroke-dasharray:578.05; stroke-dashoffset:578.05;
+    transform:rotate(-90deg); transform-box:fill-box; transform-origin:center;
+    transition:stroke-dashoffset .16s ease;
+  }
+  .chew-live .rhythm-halo{ animation:rhythmPulse .8s ease-in-out infinite; }
+  @keyframes rhythmPulse{
+    0%,100%{ transform:scale(.9); opacity:.3; }
+    50%{ transform:scale(1.04); opacity:.85; }
+  }
+  .rhythm-center{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:1px;
+  }
+  .rhythm-center .n{
+    font-size:46px; font-weight:600; line-height:1; letter-spacing:-0.03em;
+    font-variant-numeric:tabular-nums; color:var(--sage-deep);
+  }
+  .rhythm-center .of{ font-size:12.5px; font-weight:700; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .rhythm-center .of b{ color:var(--sage); font-weight:700; }
+  .rhythm-msg{
+    min-height:40px; margin:8px 4px 12px; font-size:13.5px; line-height:1.5;
+    color:var(--ink-soft);
+  }
+  .rhythm-msg.done{ color:var(--sage-deep); font-weight:700; }
+  .rhythm-actions{ display:flex; gap:8px; }
+  .rhythm-actions .btn{ flex:1; padding:14px 10px; }
+  .rhythm-actions .btn.ghost{ flex:0 0 auto; font-size:13px; padding:14px 15px; }
+  .rhythm-tap{
+    width:100%; margin-top:8px; padding:13px; border-radius:16px; cursor:pointer;
+    border:1px dashed rgba(126,155,128,.34); background:#FBF8F1; color:var(--sage-deep);
+    font-family:inherit; font-size:13.5px; font-weight:700;
+    transition:background .16s ease, transform .12s ease;
+  }
+  .rhythm-tap:active{ transform:scale(.985); background:var(--sage-soft); }
+  .rhythm-foot{
+    display:flex; align-items:center; justify-content:center; gap:10px; margin-top:8px;
+  }
+  .rhythm-foot .link-btn{ font-size:12px; white-space:nowrap; }
+
   /* ---------- water card ---------- */
   .water-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
   .water-head h3{ margin:0; }
@@ -507,6 +561,50 @@
           <button type="button" class="btn ghost" id="resetBtn" hidden>처음부터</button>
         </div>
         <button type="button" class="link-btn" id="soundToggle" aria-pressed="true" style="margin-top:10px;">🔔 종소리 켜짐</button>
+      </div>
+
+      <div class="card rhythm-card" id="chewCard" data-number-ok>
+        <div class="head">
+          <span class="ic">🥢</span>
+          <p class="eyebrow">한입 씹기 리듬</p>
+        </div>
+        <h2>한입에 마흔다섯 번, 리듬으로</h2>
+        <p class="lead2">휴대폰을 옆에 두고, 화면이 세어 주는 리듬에 맞춰 천천히 씹어 보세요.</p>
+        <div class="seg rhythm-goal" id="chewGoals" role="group" aria-label="한입 목표 횟수">
+          <button type="button" data-goal="40" aria-pressed="false">40번</button>
+          <button type="button" data-goal="45" aria-pressed="true">45번</button>
+          <button type="button" data-goal="50" aria-pressed="false">50번</button>
+        </div>
+
+        <div class="rhythm-ring-wrap" id="chewRingWrap">
+          <svg class="rhythm-ring" viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+              <linearGradient id="rhythmGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#C9DFC4"/>
+                <stop offset="55%" stop-color="#8FB59A"/>
+                <stop offset="100%" stop-color="#E0C99C"/>
+              </linearGradient>
+            </defs>
+            <circle class="rhythm-track" cx="100" cy="100" r="92"/>
+            <circle class="rhythm-halo" cx="100" cy="100" r="76"/>
+            <circle class="rhythm-prog" id="chewProg" cx="100" cy="100" r="92"/>
+          </svg>
+          <div class="rhythm-center">
+            <div class="n" id="chewCount">0</div>
+            <div class="of">/ <b id="chewGoalLabel">45</b>번</div>
+          </div>
+        </div>
+
+        <p class="rhythm-msg" id="chewMsg" aria-live="polite">시작을 누르면 천천히 한 번씩 세어 드려요</p>
+        <div class="rhythm-actions">
+          <button type="button" class="btn primary" id="chewBtn">시작</button>
+          <button type="button" class="btn ghost" id="chewNext">처음부터</button>
+        </div>
+        <button type="button" class="rhythm-tap" id="chewTap">＋ 하나 더 씹었어요</button>
+
+        <div class="rhythm-foot">
+          <button type="button" class="link-btn" id="chewSound" aria-pressed="true">🔔 완료음 켜짐</button>
+        </div>
       </div>
 
       <div class="card">
@@ -1090,7 +1188,7 @@
         if (feel === '속 편해요') calm += 1;
         else if (feel === '살짝 더부룩' || feel === '체한 느낌') rough += 1;
       }
-      if (d && d.bites > 0) chewDays += 1;
+      if (d && (d.bites > 0 || d.chews > 0)) chewDays += 1;
       if (d && d.water > 0) waterDays += 1;
       if (d && moveSteps(d) > MOVE_BASE_STEPS) stepDays += 1;
     }
@@ -1128,6 +1226,9 @@
   /* ---------- storage ---------- */
   var STORE_KEY = 'intuitive-meal-app.v1';
   var CHEW_SECONDS = [20, 25, 30, 40];
+  // 한입 씹기 리듬: 목표 40~50번, 0.8초에 한 번(자동 리듬)
+  var CHEW_GOALS = [40, 45, 50];
+  var CHEW_INTERVAL_MS = 800;
 
   function pad(n) { return n < 10 ? '0' + n : String(n); }
 
@@ -1145,6 +1246,7 @@
       exerciseKcal: null,
       meals: [],
       bites: 0,
+      chews: 0,
       feels: [],
       water: 0,
       waterLog: []
@@ -1169,6 +1271,8 @@
       if (!Array.isArray(d.feels)) d.feels = [];
       if (!Array.isArray(d.waterLog)) d.waterLog = [];
       if (typeof d.bites !== 'number' || !isFinite(d.bites)) d.bites = 0;
+      if (typeof d.chews !== 'number' || !isFinite(d.chews) || d.chews < 0) d.chews = 0;
+      else d.chews = Math.round(d.chews);
       if (typeof d.water !== 'number' || !isFinite(d.water)) d.water = 0;
       if (d.activity !== 'active') d.activity = 'usual';
       if (typeof d.steps !== 'number' || !isFinite(d.steps) || d.steps < 0) {
@@ -1192,6 +1296,8 @@
     if (!parsed.settings || typeof parsed.settings !== 'object') parsed.settings = {};
     if (CHEW_SECONDS.indexOf(parsed.settings.sec) < 0) parsed.settings.sec = 25;
     if (typeof parsed.settings.sound !== 'boolean') parsed.settings.sound = true;
+    if (CHEW_GOALS.indexOf(parsed.settings.chewGoal) < 0) parsed.settings.chewGoal = 45;
+    if (typeof parsed.settings.chewSound !== 'boolean') parsed.settings.chewSound = true;
     return parsed;
   }
 
@@ -1425,9 +1531,10 @@
     }
   }
 
+  // 오늘 천천히 씹은 한 입 = 한 입 타이머로 끝낸 한 입 + 리듬으로 다 씹은 한 입
   function renderChewCount() {
     var day = today();
-    $('biteCount').textContent = String(day.bites || 0);
+    $('biteCount').textContent = String((day.bites || 0) + (day.chews || 0));
   }
 
   function renderSoundToggle() {
@@ -1435,6 +1542,151 @@
     var on = state.settings.sound;
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     btn.textContent = on ? '🔔 종소리 켜짐' : '🔕 종소리 꺼짐';
+  }
+
+  /* ---------- 한입 씹기 리듬 카운터 ---------- */
+  var chew = { running: false, count: 0, nextAt: 0, raf: 0 };
+  var RHYTHM_C = 2 * Math.PI * 92;
+
+  function chewGoal() { return state.settings.chewGoal; }
+
+  function paintChew() {
+    var goal = chewGoal();
+    var shown = Math.max(0, Math.min(chew.count, goal));
+    setText($('chewCount'), String(shown));
+    setText($('chewGoalLabel'), String(goal));
+    var ratio = goal > 0 ? shown / goal : 0;
+    $('chewProg').style.strokeDashoffset = String(RHYTHM_C * (1 - ratio));
+  }
+
+  function renderChewGoals() {
+    var buttons = $('chewGoals').querySelectorAll('button');
+    for (var i = 0; i < buttons.length; i++) {
+      var on = Number(buttons[i].getAttribute('data-goal')) === chewGoal();
+      buttons[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+  }
+
+  function renderChewSound() {
+    var btn = $('chewSound');
+    var on = state.settings.chewSound;
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    btn.textContent = on ? '🔔 완료음 켜짐' : '🔕 완료음 꺼짐';
+  }
+
+  function chewStopLoop() {
+    cancelAnimationFrame(chew.raf);
+    $('chewRingWrap').classList.remove('chew-live');
+  }
+
+  // 처음으로: 0으로 되돌리고 멈춘다
+  function resetChew(msg) {
+    chew.running = false;
+    chew.count = 0;
+    chewStopLoop();
+    setText($('chewBtn'), '시작');
+    paintChew();
+    var m = $('chewMsg');
+    m.textContent = msg || '시작을 누르면 천천히 한 번씩 세어 드려요';
+    m.classList.remove('done');
+  }
+
+  function startChew() {
+    unlockAudio();
+    if (chew.count >= chewGoal()) chew.count = 0;
+    chew.running = true;
+    chew.nextAt = performance.now() + CHEW_INTERVAL_MS;
+    $('chewRingWrap').classList.add('chew-live');
+    setText($('chewBtn'), '멈춤');
+    var m = $('chewMsg');
+    m.textContent = '천천히, 리듬에 맞춰 씹어 보세요';
+    m.classList.remove('done');
+    paintChew();
+    cancelAnimationFrame(chew.raf);
+    chew.raf = requestAnimationFrame(chewLoop);
+  }
+
+  function chewLoop() {
+    if (!chew.running) return;
+    var now = performance.now();
+    if (now >= chew.nextAt) {
+      chew.count += 1;
+      // 화면이 꺼졌다 켜져도 밀린 횟수를 한꺼번에 세지 않는다(지금부터 다시 리듬)
+      chew.nextAt = now + CHEW_INTERVAL_MS;
+      paintChew();
+      if (chew.count >= chewGoal()) { completeChew(); return; }
+    }
+    chew.raf = requestAnimationFrame(chewLoop);
+  }
+
+  function pauseChew() {
+    chew.running = false;
+    chewStopLoop();
+    setText($('chewBtn'), '이어서');
+    $('chewMsg').textContent = '잠깐 쉬어 가도 괜찮아요. 이어서 눌러 주세요.';
+  }
+
+  function completeChew() {
+    chew.running = false;
+    chew.count = chewGoal();
+    chewStopLoop();
+    paintChew();
+    var day = today();
+    day.chews = (day.chews || 0) + 1;
+    saveState();
+    renderChewCount();
+    renderWeek();
+    playChewDone();
+    var m = $('chewMsg');
+    m.textContent = '잘 씹었어요! 잠시 숨 고르고 다음 한입으로.';
+    m.classList.add('done');
+    setText($('chewBtn'), '다음 한입');
+  }
+
+  // 손으로 하나씩 — 자동 리듬과 함께 쓸 수 있다
+  function countChewByHand() {
+    unlockAudio();
+    // 다 씹은 뒤에 또 누르면 = 다음 한입의 첫 번째
+    if (chew.count >= chewGoal()) resetChew();
+    chew.count += 1;
+    paintChew();
+    if (chew.count >= chewGoal()) { completeChew(); return; }
+    if (chew.running) chew.nextAt = performance.now() + CHEW_INTERVAL_MS;
+    else {
+      var m = $('chewMsg');
+      m.textContent = '한 번씩 같이 세고 있어요. 리듬은 시작을 누르면 맞춰 드려요.';
+      m.classList.remove('done');
+    }
+  }
+
+  function playChewDone() {
+    if (state.settings.chewSound) {
+      var ctx = ensureAudio();
+      if (ctx) {
+        try {
+          if (ctx.state === 'suspended') ctx.resume();
+          var now = ctx.currentTime + 0.02;
+          var notes = [
+            { f: 523.25, t: 0,    d: 0.75, g: 0.075 },
+            { f: 659.25, t: 0.16, d: 0.95, g: 0.060 },
+            { f: 783.99, t: 0.32, d: 1.15, g: 0.040 }
+          ];
+          for (var i = 0; i < notes.length; i++) {
+            var n = notes[i];
+            var osc = ctx.createOscillator();
+            var gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(n.f, now + n.t);
+            gain.gain.setValueAtTime(0.0001, now + n.t);
+            gain.gain.exponentialRampToValueAtTime(n.g, now + n.t + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + n.t + n.d);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(now + n.t); osc.stop(now + n.t + n.d + 0.05);
+          }
+        } catch (e) { /* ignore */ }
+      }
+    }
+    if (navigator.vibrate) { try { navigator.vibrate([16, 60, 16]); } catch (e) {} }
   }
 
   /* ---------- water ---------- */
@@ -1662,7 +1914,7 @@
       var waterHtml = waterText ? ('<p class="day-water" data-number-ok>' + waterText + '</p>') : '';
       var stepText = (typeof day.steps === 'number' && day.steps > 0)
         ? ('<p class="day-step" data-number-ok>걸음 ' + fmtNum(day.steps) + '보</p>') : '';
-      var chewOn = day.bites > 0;
+      var chewOn = day.bites > 0 || day.chews > 0;
       var activeOn = day.activity === 'active' || moveSteps(day) >= 9000 || moveExerciseKcal(day) > 0;
 
       html += '<div class="day-row' + (isToday ? ' today' : '') + '">'
@@ -1690,6 +1942,9 @@
     renderChewOptions();
     renderChewCount();
     renderSoundToggle();
+    renderChewGoals();
+    renderChewSound();
+    paintChew();
     renderWater();
     renderMove();
     renderSuggestion();
@@ -1738,6 +1993,32 @@
       else startTimer();
     });
     $('resetBtn').addEventListener('click', resetTimer);
+
+    $('chewGoals').addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      var goal = Number(btn.getAttribute('data-goal'));
+      if (CHEW_GOALS.indexOf(goal) < 0) return;
+      state.settings.chewGoal = goal;
+      saveState();
+      renderChewGoals();
+      resetChew('목표를 ' + goal + '번으로 바꿨어요. 준비되면 시작을 눌러 주세요.');
+    });
+
+    $('chewBtn').addEventListener('click', function () {
+      if (chew.running) { pauseChew(); return; }
+      // 다 씹은 뒤의 '다음 한입'은 0으로 돌리고 바로 새 한입을 시작한다
+      if (chew.count >= chewGoal()) chew.count = 0;
+      startChew();
+    });
+    $('chewNext').addEventListener('click', function () { resetChew('이번 한입을 처음부터 다시 세어 볼게요'); });
+    $('chewTap').addEventListener('click', countChewByHand);
+    $('chewSound').addEventListener('click', function () {
+      state.settings.chewSound = !state.settings.chewSound;
+      saveState();
+      renderChewSound();
+      if (state.settings.chewSound) { unlockAudio(); playChewDone(); }
+    });
 
     $('soundToggle').addEventListener('click', function () {
       state.settings.sound = !state.settings.sound;
@@ -1966,6 +2247,7 @@
 
     draft.slot = slotFor(now.getHours());
     resetTimer();
+    resetChew();
     renderAll();
     bindEvents();
 
