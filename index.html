@@ -576,7 +576,7 @@
           <button type="button" data-goal="50" aria-pressed="false">50번</button>
         </div>
 
-        <div class="rhythm-ring-wrap" id="chewRingWrap">
+        <div class="rhythm-ring-wrap" id="chewRingWrap" role="progressbar" aria-label="이번 한입 씹은 횟수" aria-valuemin="0" aria-valuemax="45" aria-valuenow="0">
           <svg class="rhythm-ring" viewBox="0 0 200 200" aria-hidden="true">
             <defs>
               <linearGradient id="rhythmGrad" x1="0" y1="0" x2="1" y2="1">
@@ -1557,6 +1557,10 @@
     setText($('chewGoalLabel'), String(goal));
     var ratio = goal > 0 ? shown / goal : 0;
     $('chewProg').style.strokeDashoffset = String(RHYTHM_C * (1 - ratio));
+    var wrap = $('chewRingWrap');
+    wrap.setAttribute('aria-valuemax', String(goal));
+    wrap.setAttribute('aria-valuenow', String(shown));
+    wrap.setAttribute('aria-valuetext', shown + ' / ' + goal + '번');
   }
 
   function renderChewGoals() {
