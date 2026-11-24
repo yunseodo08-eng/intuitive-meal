@@ -380,6 +380,47 @@
   .fill[data-state="full"] .fill-bar{ background:linear-gradient(90deg, #CADFC2 0%, #E0C99C 100%); }
   .fill[data-state="gentle"] .fill-bar{ background:linear-gradient(90deg, #C7DBD2 0%, #A6C4B2 100%); }
   .fill-note{ margin:8px 0 0; font-size:12px; line-height:1.5; color:var(--muted); font-weight:600; }
+  .fill-caption{ margin:6px 0 0; font-size:10.5px; line-height:1.5; color:#AEB6A8; }
+
+  /* ---------- 단백질 충족 여부 (숫자 없이 배지·바만) ---------- */
+  .protein{
+    margin:2px 0 14px; padding:13px 14px 12px; border-radius:18px;
+    background:linear-gradient(150deg, #FBF7EE 0%, #FFFDF8 75%);
+    border:1px solid rgba(126,155,128,.18);
+  }
+  .protein-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .protein-label{ font-size:11.5px; font-weight:700; color:var(--sage); letter-spacing:.01em; }
+  .protein-badge{
+    font-size:11px; font-weight:700; border-radius:999px; padding:5px 10px;
+    background:#F3EEE2; color:#8C8674; white-space:nowrap;
+    transition:background .3s ease, color .3s ease;
+  }
+  .protein[data-state="near"] .protein-badge{ background:#F7F0DC; color:#8A7448; }
+  .protein[data-state="full"] .protein-badge{ background:var(--sage-soft); color:var(--sage-deep); }
+  .protein-track{
+    position:relative; height:8px; margin-top:10px; border-radius:999px; overflow:hidden;
+    background:linear-gradient(90deg, rgba(236,229,213,.95), rgba(246,242,232,.95));
+    box-shadow:inset 0 1px 2px rgba(96,112,90,.08);
+  }
+  .protein-bar{
+    height:100%; width:0; border-radius:999px;
+    background:linear-gradient(90deg, #E6D6B4 0%, #D6C094 100%);
+    transition:width .5s cubic-bezier(.2,.8,.2,1), background .4s ease;
+  }
+  .protein[data-state="near"] .protein-bar{ background:linear-gradient(90deg, #DCE4C6 0%, #B4C99F 100%); }
+  .protein[data-state="full"] .protein-bar{ background:linear-gradient(90deg, #CADFC2 0%, #8CAA8C 100%); }
+  .protein-note{ margin:9px 0 0; font-size:12px; line-height:1.5; color:var(--ink-soft); font-weight:600; }
+  .protein-chips{ display:flex; flex-wrap:wrap; gap:6px; margin-top:11px; }
+  .pchip{
+    border:1px solid rgba(126,155,128,.18); background:#FFFDF8; border-radius:999px;
+    padding:7px 11px; font-family:inherit; font-size:12px; font-weight:600; color:var(--ink-soft);
+    cursor:pointer; transition:background .16s ease, color .16s ease, border-color .16s ease, transform .12s ease;
+  }
+  .pchip:active{ transform:scale(.96); }
+  .pchip[aria-pressed="true"]{
+    background:var(--sage-deep); color:#FFFDF8; border-color:var(--sage-deep);
+  }
+  .protein-hint{ margin:8px 0 0; font-size:10.5px; line-height:1.5; color:#AEB6A8; }
 
   .slots{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:16px; }
   .slots button{
@@ -670,7 +711,7 @@
           <span class="ic">👟</span>
           <p class="eyebrow">오늘 움직임</p>
         </div>
-        <p class="muted" style="margin:2px 0 0;">걸음 수와 운동만 적으면 오늘 유지칼로리가 바로 바뀌어요.</p>
+        <p class="muted" style="margin:2px 0 0;">걸음 수와 운동만 적어 두면 오늘 얼마나 움직였는지 남아요.</p>
 
         <div class="move-block">
           <p class="move-label"><span class="em">🚶</span>걸음 수</p>
@@ -707,36 +748,51 @@
               <button type="button" class="qchip" data-min="60">60분</button>
             </div>
           </div>
-          <div class="num-field" style="margin-top:10px;">
-            <input id="burnInput" type="number" inputmode="numeric" min="0" max="2000" step="5" placeholder="워치에 나온 소모값 (선택)" aria-label="직접 적는 운동 소모 칼로리">
-            <span class="suffix">kcal</span>
-          </div>
-          <p class="move-hint">워치에 나온 값이 있으면 직접 적어 주세요. 적으면 그 값으로 계산해요.</p>
         </div>
 
         <div class="move-readout" id="moveReadout">
-          <span class="rk-label">오늘 유지칼로리</span>
-          <span class="rk-val"><b id="maintKcal">1,500</b><span class="u">kcal</span></span>
           <p class="rk-sub" id="maintNote">평소와 비슷하게 움직였어요</p>
           <p class="rk-sub rk-basis" id="moveBasis">걸음 6,000보 · 운동은 아직 없어요</p>
+          <p class="rk-sub rk-basis">기초대사 채움은 움직임과 상관없이 그대로예요</p>
         </div>
       </div>
 
-      <div class="card suggest">
+      <div class="card suggest" id="goalCard">
         <div class="suggest-top">
           <span class="ic">🌿</span>
           <p class="eyebrow">포근한 제안</p>
         </div>
         <div class="fill" id="fillMeter" data-state="calm">
           <div class="fill-head">
-            <span class="fill-label" id="fillLabel">오늘 유지선</span>
+            <span class="fill-label" id="fillLabel">오늘 기초대사</span>
             <span class="fill-pct" data-number-ok aria-hidden="true"><b id="fillPct">0</b><span class="pct-sign">%</span></span>
           </div>
-          <div class="fill-track" id="fillTrack" role="progressbar" aria-label="오늘 유지선을 얼마나 채웠는지" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="fill-track" id="fillTrack" role="progressbar" aria-label="오늘 기초대사를 얼마나 채웠는지" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <div class="fill-bar" id="fillBar"></div>
           </div>
           <p class="fill-note" id="fillNote">아직 첫 끼 전이에요</p>
+          <p class="fill-caption">숨 쉬고 심장 뛰는 데 쓰는 몫이에요. 여기 닿으면 충분해요.</p>
         </div>
+
+        <div class="protein" id="proteinCard" data-state="low">
+          <div class="protein-head">
+            <span class="protein-label">🥚 단백질</span>
+            <span class="protein-badge" id="proteinBadge">아직 부족</span>
+          </div>
+          <div class="protein-track" id="proteinTrack" role="progressbar" aria-label="오늘 단백질을 얼마나 챙겼는지" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="protein-bar" id="proteinBar"></div>
+          </div>
+          <p class="protein-note" id="proteinNote">두부·고기·생선·프로틴 중 하나만 골라도 좋아요</p>
+          <div class="protein-chips" id="proteinChips" role="group" aria-label="단백질 한 접시 챙기기">
+            <button type="button" class="pchip" data-protein="두부" aria-pressed="false">두부</button>
+            <button type="button" class="pchip" data-protein="고기·생선" aria-pressed="false">고기·생선</button>
+            <button type="button" class="pchip" data-protein="닭가슴살" aria-pressed="false">닭가슴살</button>
+            <button type="button" class="pchip" data-protein="프로틴 음료" aria-pressed="false">프로틴 음료</button>
+            <button type="button" class="pchip" data-protein="그릭요거트" aria-pressed="false">그릭요거트</button>
+          </div>
+          <p class="protein-hint">다 적지 않아도, 챙긴 것만 눌러 두면 돼요</p>
+        </div>
+
         <p class="suggest-main" id="suggestMain">오늘 첫 끼를 기다리고 있어요</p>
         <p class="suggest-aside" id="suggestAside">먹은 걸 남겨 주시면, 남은 하루에 맞춰 가볍게 제안해 드릴게요.</p>
       </div>
@@ -859,6 +915,7 @@
         <span><span class="dot calm" style="width:8px;height:8px;border-radius:50%;background:#A9C6A4;display:inline-block;"></span>속이 편안했어요</span>
         <span><span style="width:8px;height:8px;border-radius:50%;background:#E2C89B;display:inline-block;"></span>살짝 더부룩</span>
         <span><span style="width:8px;height:8px;border-radius:50%;background:#DFB49C;display:inline-block;"></span>조금 무거웠어요</span>
+        <span>🥚 단백질 충분히 챙김</span>
       </div>
       <p class="privacy-note">🌿 모든 기록은 윤서 님의 이 기기 브라우저 안에만 남아요.<br>어디로도 보내지 않아요.</p>
     </section>
@@ -916,13 +973,17 @@
     '커피':             { k: 10,  c: 1,  p: 0.5,f: 0 }
   };
 
-  // 153cm / 40kg · 기초대사량 ~1,095kcal · 평소 일상 6,000걸음 기준 유지선 1,500kcal
+  // 153cm / 40kg · 기초대사량 ~1,095kcal · 평소 일상 6,000걸음
   var MOVE_BASE_STEPS = 6000;      // 평소 하루 걸음 수
-  var MOVE_BASE_KCAL = 1500;       // 그때의 유지선
-  var STEPS_KCAL_PER_1000 = 25;    // 1,000보당 ±25kcal
-  var MOVE_MIN_KCAL = 1100;        // 하한선 없음 — 비정상 값 방지용 최소값(0보 1,350보다 낮아 실제로는 걸리지 않음)
+  var STEPS_KCAL_PER_1000 = 25;    // 걷기 1,000보 ≈ 25kcal (제안 문구용 숨은 값)
   var MOVE_MAX_STEPS = 50000;
   var MOVE_MAX_EX_KCAL = 2000;
+
+  // 오늘의 두 가지 기준 (숨은 값 — 화면에는 %와 충족 여부만 나간다)
+  var BMR_KCAL = 1095;             // 기초대사량: 숨·심장·체온에 쓰는 몫
+  var PROTEIN_TARGET_G = 40;       // 체중 × 1g
+  var PROTEIN_SERVING_G = 20;      // 원탭 '한 접시' = 단백질 1회분 추정
+  var PROTEIN_TAGS = ['두부', '고기·생선', '닭가슴살', '프로틴 음료', '그릭요거트'];
 
   // 운동 종류별 분당 소모
   var EXERCISE_TYPES = {
@@ -931,9 +992,6 @@
     strength: { label: '근력·빠른 걷기', perMin: 4.2 },
     cardio:   { label: '유산소',        perMin: 6.0 }
   };
-
-  // 목표선의 탄단지 비율은 1,500kcal 기준값을 그대로 비례해서 쓴다
-  var MACRO_SPLIT = { c: 195 / 1500, p: 55 / 1500, f: 50 / 1500 };
 
   function moveSteps(day) {
     var v = day ? day.steps : null;
@@ -951,23 +1009,13 @@
     return EXERCISE_TYPES[kind].perMin * Math.min(300, mins);
   }
 
-  // 오늘 유지칼로리: 기본선 + 걸음 수 차이 + 운동량 → 10단위 반올림
-  function targetKcal(day) {
-    var steps = moveSteps(day);
-    var kcal = MOVE_BASE_KCAL
-      + ((steps - MOVE_BASE_STEPS) / 1000) * STEPS_KCAL_PER_1000
-      + moveExerciseKcal(day);
-    if (kcal < MOVE_MIN_KCAL) kcal = MOVE_MIN_KCAL;
-    return Math.round(kcal / 10) * 10;
+  // 걸음·운동으로 평소보다 얼마나 더 움직였는지(제안 문구용 숨은 값)
+  function moveBumpKcal(day) {
+    return ((moveSteps(day) - MOVE_BASE_STEPS) / 1000) * STEPS_KCAL_PER_1000 + moveExerciseKcal(day);
   }
 
-  function targetFor(day) {
-    var kcal = targetKcal(day);
-    return { k: kcal, c: kcal * MACRO_SPLIT.c, p: kcal * MACRO_SPLIT.p, f: kcal * MACRO_SPLIT.f };
-  }
-
-  function moveDiffKcal(day) {
-    return targetKcal(day) - MOVE_BASE_KCAL;
+  function isActiveDay(day) {
+    return moveSteps(day) >= 9000 || moveBumpKcal(day) >= 60;
   }
 
   var PORTION = {
@@ -1013,6 +1061,53 @@
     return total;
   }
 
+  // 원탭으로 챙긴 단백질 접시 — 아는 이름만 받는다
+  function proteinTags(day) {
+    var list = (day && day.proteinTags) || [];
+    var out = [];
+    if (!Array.isArray(list)) return out;
+    for (var i = 0; i < list.length; i++) {
+      if (PROTEIN_TAGS.indexOf(list[i]) >= 0 && out.indexOf(list[i]) < 0) out.push(list[i]);
+    }
+    return out;
+  }
+
+  function proteinGrams(day) {
+    return dayTotals(day).p + proteinTags(day).length * PROTEIN_SERVING_G;
+  }
+
+  // 단백질을 충분히 챙겼는지. 화면에는 배지와 진행 바만 나가고 g 숫자는 나가지 않는다.
+  function proteinMeter(day, now) {
+    var grams = proteinGrams(day);
+    var pct = Math.round(grams / PROTEIN_TARGET_G * 100);
+    if (!isFinite(pct) || pct < 0) pct = 0;
+    var meals = (day && day.meals) || [];
+    var touched = meals.length > 0 || proteinTags(day).length > 0;
+    var hour = now ? now.getHours() : 12;
+    var out = { pct: pct, badge: '아직 부족', tone: 'low', note: '' };
+
+    if (pct >= 90) {
+      out.tone = 'full';
+      out.badge = '충분히 챙김 ✓';
+      out.note = '오늘은 충분히 챙기셨어요. 근육 걱정은 내려놓으셔도 돼요.';
+      return out;
+    }
+    if (pct >= 50) {
+      out.tone = 'near';
+      out.badge = '거의 채움';
+      out.note = '한 접시만 더 챙기면 오늘은 충분해요.';
+      return out;
+    }
+    if (!touched) {
+      out.note = hour >= 21
+        ? '늦었지만 괜찮아요. 두유나 우유 한 잔이라도 가볍게 곁들여 볼까요?'
+        : '두부·고기·생선·프로틴 중 하나만 골라도 좋아요.';
+      return out;
+    }
+    out.note = '한 접시만 더 챙기면 근육 걱정은 접어 둘 수 있어요.';
+    return out;
+  }
+
   function hashKey(key) {
     var h = 7;
     for (var i = 0; i < String(key).length; i++) {
@@ -1042,28 +1137,25 @@
 
   // The hidden guide. Returns only gentle Korean wording — never a number.
   function buildSuggestion(day, now) {
-    var target = targetFor(day);
     var totals = dayTotals(day);
+    var grams = proteinGrams(day);
     var hour = now.getHours();
-    var steps = moveSteps(day);
-    // 많이 움직인 날 = 걸음이 확실히 많거나, 운동으로 유지선이 눈에 띄게 올라간 날
-    // ('오늘 움직임' 카드의 안내 문구와 같은 기준)
-    var active = steps >= 9000 || (target.k - MOVE_BASE_KCAL) >= 60;
+    var active = isActiveDay(day);
     var meals = (day && day.meals) || [];
-    var ratio = target.k > 0 ? totals.k / target.k : 0;
+    var touched = meals.length > 0 || proteinTags(day).length > 0;
+    var fill = totals.k / BMR_KCAL;
+    var proteinOk = grams >= PROTEIN_TARGET_G * 0.9;
     var last = lastMeal(day);
     var lastFeel = last ? last.tummy : '';
-    var lowCarb = totals.c < target.c * 0.5;
-    var lowProtein = totals.p < target.p * 0.5;
-    var proteinNote = '단백질은 두부 한 접시나 두유 한 잔으로 가볍게 채워 두면 좋아요.';
+    var proteinAside = '두부·고기·생선·프로틴 중 하나만 곁들여도 좋아요.';
 
-    if (!meals.length) {
+    if (!touched) {
       if (hour < 10) {
         return {
           main: '아침은 아직이네요. 속이 편한 걸로 가볍게 시작해 볼까요?',
           aside: active
             ? '오늘 많이 움직이는 날이니 밥 반 공기에 두유 한 잔처럼 조금 든든하게 시작해도 좋아요.'
-            : '식빵 반 쪽에 두유, 또는 밥 반 공기와 미역국 같은 조합이 속을 편하게 해 줘요.'
+            : '식빵 반 쪽에 두유, 또는 밥 반 공기와 미역국에 단백질 반찬 하나면 충분해요.'
         };
       }
       if (hour < 16) {
@@ -1092,26 +1184,41 @@
       };
     }
 
-    if (ratio < 0.3) {
+    if (fill < 0.3) {
       if (hour >= 21) {
         return {
           main: '오늘은 아직 여유가 꽤 있어요.',
-          aside: '늦은 시간이라도 배가 고프면 죽이나 미역국밥 반 그릇부터 천천히 시작해 보세요. 밥 반 공기까지 드셔도 괜찮아요 — 밤에 굶고 자면 새벽에 더 당겨요.'
+          aside: '늦은 시간이라도 배가 고프면 죽이나 미역국밥 반 그릇부터 천천히 시작해 보세요. 밤에 굶고 자면 새벽에 더 당겨요.'
         };
       }
       if (active) {
         return {
-          main: '오늘 많이 움직여서 유지선에 여유가 생겼어요.',
-          aside: '간식이나 밥을 조금 더 든든히 챙겨도 좋아요. 밥 반 공기에 반찬 두 가지, 과일 한 조각까지 곁들여 보세요.'
+          main: '오늘 많이 움직여서 든든히 챙겨도 괜찮은 날이에요.',
+          aside: '밥 반 공기에 반찬 두 가지, 단백질 반찬 하나까지 곁들여 보세요.'
         };
       }
       return {
-        main: '아직 여유가 꽤 있어요.',
-        aside: '밥 반 공기에 따뜻한 반찬 두 가지면 딱 좋아요.' + (lowCarb ? ' 빵이나 과일도 한 조각 곁들여 보세요.' : ' 다음 끼니에 과일 한 조각도 좋아요.')
+        main: '아직 기초대사까지 여유가 많아요.',
+        aside: '밥 반 공기에 따뜻한 반찬 두 가지면 딱 좋아요.'
+          + (proteinOk ? ' 다음 끼니에 과일 한 조각도 좋아요.' : ' ' + proteinAside)
       };
     }
 
-    if (ratio < 0.72) {
+    if (!proteinOk && fill < 0.9) {
+      if (hour >= 21) {
+        return {
+          main: '오늘 단백질이 조금 아쉬워요.',
+          aside: '늦은 시간엔 두유 한 팩이나 그릭요거트 한 컵처럼 가볍게 곁들여 보세요. 속이 편한 쪽으로 골라도 괜찮아요.'
+        };
+      }
+      return {
+        main: '오늘 단백질이 조금 아쉬워요.',
+        aside: (active ? '많이 움직인 날일수록 근육이 아쉬워요. ' : '')
+          + '다음 끼니에 두부·고기·생선·닭가슴살·프로틴 중 하나만 얹어 보세요. 그것 하나면 충분해요.'
+      };
+    }
+
+    if (fill < 0.72) {
       if (hour >= 21) {
         return {
           main: '지금까지 딱 알맞게 잘 드셨어요!',
@@ -1124,14 +1231,15 @@
           ? '점심엔 밥 반 공기와 따뜻한 국물, 단백질 반찬 한 가지로 채워 보세요.'
           : '저녁엔 두부·야채찜 한 접시와 맑은 국 한 그릇으로 가볍게 마무리해 볼까요?')
           + (active ? ' 오늘 많이 움직였으니 밥은 평소보다 조금 넉넉하게 잡아도 괜찮아요.' : '')
-          + (lowProtein ? ' ' + proteinNote : '')
       };
     }
 
-    if (ratio < 1.0) {
+    if (fill < 0.9) {
       return {
         main: '오늘 필요한 만큼 거의 다 채우셨어요.',
-        aside: '남은 끼니는 두부·야채찜 한 접시에 따뜻한 국물 반 그릇 정도가 딱 좋아요. 간식이 당기면 사과 하나나 두유 한 팩이면 충분해요.'
+        aside: proteinOk
+          ? '남은 끼니는 두부·야채찜 한 접시에 따뜻한 국물 반 그릇 정도가 딱 좋아요. 간식이 당기면 사과 하나나 두유 한 팩이면 충분해요.'
+          : '마지막 끼니엔 두부나 생선 한 토막만 곁들이면 오늘은 충분해요.'
       };
     }
 
@@ -1141,18 +1249,18 @@
     };
   }
 
-  // 오늘 유지선 대비 채움 정도. 화면에는 오직 퍼센티지(%)만 나간다.
-  // 숨은 영양 수치는 이 함수 밖으로 나가지 않는다.
+  // 오늘 기초대사(숨·심장·체온에 쓰는 몫) 대비 채움 정도.
+  // 화면에는 오직 퍼센티지(%)만 나간다. 숨은 영양 수치는 이 함수 밖으로 나가지 않는다.
   function fillMeter(day, now) {
-    var target = targetFor(day);
     var totals = dayTotals(day);
-    var pct = target.k > 0 ? Math.round(totals.k / target.k * 100) : 0;
+    var pct = BMR_KCAL > 0 ? Math.round(totals.k / BMR_KCAL * 100) : 0;
     if (!isFinite(pct) || pct < 0) pct = 0;
     var meals = (day && day.meals) || [];
+    var touched = meals.length > 0 || proteinTags(day).length > 0;
     var hour = now.getHours();
-    var out = { pct: pct, note: '', tone: 'calm', label: '오늘 유지선' };
+    var out = { pct: pct, note: '', tone: 'calm', label: '오늘 기초대사' };
 
-    if (!meals.length) {
+    if (!touched) {
       out.note = hour < 16 ? '아직 첫 끼 전이에요' : '오늘은 아직 비어 있어요';
       return out;
     }
@@ -1169,17 +1277,17 @@
       return out;
     }
 
-    if (pct < 30) out.note = (target.k >= MOVE_BASE_KCAL + 150) ? '많이 움직인 만큼 여유가 많아요' : '아직 여유가 많아요';
-    else if (pct < 55) out.note = '절반을 향해 가는 중이에요';
-    else if (pct < 75) out.note = '딱 알맞게 채워지는 중이에요';
-    else if (pct < 95) out.note = '거의 다 채워졌어요';
-    else if (pct < 105) { out.tone = 'full'; out.note = '오늘 유지선을 충분히 채웠어요'; }
-    else { out.tone = 'full'; out.note = '든든하게 채운 날이에요'; }
+    if (pct < 25) out.note = '기초대사까지 여유가 많아요';
+    else if (pct < 50) out.note = '조금씩 채워지는 중이에요';
+    else if (pct < 75) out.note = '절반을 지나고 있어요';
+    else if (pct < 95) out.note = '기초대사에 거의 닿았어요';
+    else if (pct < 105) { out.tone = 'full'; out.note = '기초대사는 충분히 채웠어요'; }
+    else { out.tone = 'full'; out.note = '기초대사 채움 완료 · 오늘 몸은 넉넉해요'; }
     return out;
   }
 
   function weekSummary(days) {
-    var withMeals = [], calm = 0, rough = 0, chewDays = 0, waterDays = 0, stepDays = 0;
+    var withMeals = [], calm = 0, rough = 0, chewDays = 0, waterDays = 0, stepDays = 0, proteinDays = 0;
     for (var i = 0; i < days.length; i++) {
       var d = days[i];
       if (d && d.meals && d.meals.length) {
@@ -1191,6 +1299,8 @@
       if (d && (d.bites > 0 || d.chews > 0)) chewDays += 1;
       if (d && d.water > 0) waterDays += 1;
       if (d && moveSteps(d) > MOVE_BASE_STEPS) stepDays += 1;
+      if (d && ((d.meals && d.meals.length) || proteinTags(d).length)
+          && proteinGrams(d) >= PROTEIN_TARGET_G * 0.9) proteinDays += 1;
     }
     if (!withMeals.length) {
       return {
@@ -1211,6 +1321,7 @@
     else subParts.push('한 입 타이머는 다음 끼니에 한 번만 켜 봐도 좋아요.');
     if (waterDays > 0) subParts.push('물도 조금씩 나눠 마신 날이 있었어요.');
     if (stepDays > 0) subParts.push('평소보다 많이 걸은 날도 있었어요.');
+    if (proteinDays > 0) subParts.push('단백질도 충분히 챙긴 날이 있었어요.');
     return { main: main, sub: subParts.join(' ') };
   }
 
@@ -1249,11 +1360,21 @@
       chews: 0,
       feels: [],
       water: 0,
-      waterLog: []
+      waterLog: [],
+      proteinTags: []
     };
   }
 
   var state = null;
+
+  function sanitizeProteinTags(list) {
+    var out = [];
+    if (!Array.isArray(list)) return out;
+    for (var i = 0; i < list.length; i++) {
+      if (PROTEIN_TAGS.indexOf(list[i]) >= 0 && out.indexOf(list[i]) < 0) out.push(list[i]);
+    }
+    return out;
+  }
 
   function loadState() {
     var raw = null;
@@ -1274,6 +1395,7 @@
       if (typeof d.chews !== 'number' || !isFinite(d.chews) || d.chews < 0) d.chews = 0;
       else d.chews = Math.round(d.chews);
       if (typeof d.water !== 'number' || !isFinite(d.water)) d.water = 0;
+      d.proteinTags = sanitizeProteinTags(d.proteinTags);
       if (d.activity !== 'active') d.activity = 'usual';
       if (typeof d.steps !== 'number' || !isFinite(d.steps) || d.steps < 0) {
         d.steps = null;
@@ -1816,11 +1938,13 @@
     $('suggestMain').textContent = s.main;
     $('suggestAside').textContent = s.aside;
     renderFill();
+    renderProtein();
   }
 
   function renderFill() {
     var m = fillMeter(today(), new Date());
     var width = Math.min(100, Math.max(0, m.pct));
+    $('fillLabel').textContent = m.label;
     $('fillPct').textContent = String(m.pct);
     $('fillNote').textContent = m.note;
     $('fillBar').style.width = width + '%';
@@ -1828,9 +1952,27 @@
     $('fillMeter').setAttribute('data-state', m.tone);
   }
 
+  // 단백질 충족 여부: 배지 + 진행 바 + 원탭 칩
+  function renderProtein() {
+    var day = today();
+    var m = proteinMeter(day, new Date());
+    var width = Math.min(100, Math.max(0, m.pct));
+    $('proteinBadge').textContent = m.badge;
+    $('proteinNote').textContent = m.note;
+    $('proteinBar').style.width = width + '%';
+    $('proteinTrack').setAttribute('aria-valuenow', String(width));
+    $('proteinCard').setAttribute('data-state', m.tone);
+    var tags = proteinTags(day);
+    var chips = $('proteinChips').querySelectorAll('button');
+    for (var i = 0; i < chips.length; i++) {
+      var on = tags.indexOf(chips[i].getAttribute('data-protein')) >= 0;
+      chips[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+  }
+
   /* ---------- 오늘 움직임 ---------- */
   function maintNoteFor(diff) {
-    if (diff >= 200) return '평소보다 많이 움직여서 여유가 넉넉해요';
+    if (diff >= 150) return '평소보다 많이 움직인 날이에요';
     if (diff >= 60) return '평소보다 조금 더 움직인 날이에요';
     if (diff > 20) return '평소와 거의 비슷하게 움직였어요';
     if (diff <= -100) return '오늘은 몸을 조금 아껴 둔 날이에요';
@@ -1840,14 +1982,9 @@
   function moveBasisText(day) {
     var parts = [];
     parts.push('걸음 ' + fmtNum(moveSteps(day)) + '보' + (day.steps == null ? ' (평소 기준)' : ''));
-    var exKcal = moveExerciseKcal(day);
-    if (exKcal > 0) {
-      if (day.exerciseKcal) {
-        parts.push((EXERCISE_TYPES[day.exercise] && day.exercise !== 'none'
-          ? EXERCISE_TYPES[day.exercise].label : '운동') + ' ' + fmtNum(day.exerciseKcal) + 'kcal');
-      } else {
-        parts.push(EXERCISE_TYPES[day.exercise].label + ' ' + fmtNum(day.exerciseMin) + '분');
-      }
+    var mins = Number(day.exerciseMin);
+    if (EXERCISE_TYPES[day.exercise] && day.exercise !== 'none' && isFinite(mins) && mins > 0) {
+      parts.push(EXERCISE_TYPES[day.exercise].label + ' ' + fmtNum(mins) + '분');
     } else {
       parts.push('운동은 아직 없어요');
     }
@@ -1863,7 +2000,6 @@
     if (!keep) {
       $('stepsInput').value = (typeof steps === 'number') ? fmtNum(steps) : '';
       $('minInput').value = (typeof day.exerciseMin === 'number') ? String(day.exerciseMin) : '';
-      $('burnInput').value = (typeof day.exerciseKcal === 'number') ? String(day.exerciseKcal) : '';
     }
 
     var stepChips = $('stepChips').querySelectorAll('button');
@@ -1885,8 +2021,7 @@
       minChips[m].setAttribute('aria-pressed', minOn ? 'true' : 'false');
     }
 
-    $('maintKcal').textContent = fmtNum(targetKcal(day));
-    $('maintNote').textContent = maintNoteFor(moveDiffKcal(day));
+    $('maintNote').textContent = maintNoteFor(moveBumpKcal(day));
     $('moveBasis').textContent = moveBasisText(day);
   }
 
@@ -1920,6 +2055,8 @@
         ? ('<p class="day-step" data-number-ok>걸음 ' + fmtNum(day.steps) + '보</p>') : '';
       var chewOn = day.bites > 0 || day.chews > 0;
       var activeOn = day.activity === 'active' || moveSteps(day) >= 9000 || moveExerciseKcal(day) > 0;
+      var proteinOn = ((day.meals && day.meals.length) || proteinTags(day).length)
+        && proteinGrams(day) >= PROTEIN_TARGET_G * 0.9;
 
       html += '<div class="day-row' + (isToday ? ' today' : '') + '">'
         + '<div class="day-name"><b>' + weekdayKo(item.date) + '</b><span>' + (dayLabel || '&nbsp;') + '</span></div>'
@@ -1930,6 +2067,7 @@
         + '</div>'
         + '<div class="day-icons">'
         + '<span class="ic ' + (chewOn ? 'on' : 'dim') + '" title="천천히 씹기">🥄</span>'
+        + '<span class="ic ' + (proteinOn ? 'on' : 'dim') + '" title="단백질 충분">🥚</span>'
         + '<span class="ic ' + (activeOn ? 'on' : 'dim') + '" title="활동량">🚶</span>'
         + '</div>'
         + '</div>';
@@ -2088,16 +2226,6 @@
       renderWeek();
     }
 
-    function applyBurn(raw, keepInputs) {
-      var digits = String(raw == null ? '' : raw).replace(/[^0-9]/g, '');
-      var day = today();
-      day.exerciseKcal = digits ? Math.min(MOVE_MAX_EX_KCAL, Number(digits)) : null;
-      saveState();
-      renderMove({ keepInputs: keepInputs });
-      renderSuggestion();
-      renderWeek();
-    }
-
     $('stepsInput').addEventListener('input', function () { applySteps(this.value, true); });
     $('stepsInput').addEventListener('change', function () { applySteps(this.value, true); });
     // 입력이 끝나면 "12,000"처럼 쉼표를 넣어 정리한다
@@ -2139,8 +2267,23 @@
       applyExerciseMin(String(value));
     });
 
-    $('burnInput').addEventListener('input', function () { applyBurn(this.value, true); });
-    $('burnInput').addEventListener('change', function () { applyBurn(this.value, true); });
+    // 단백질 원탭: 챙긴 것만 눌러 두면 단백질 충족 여부에 바로 반영된다
+    $('proteinChips').addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      var tag = btn.getAttribute('data-protein');
+      if (PROTEIN_TAGS.indexOf(tag) < 0) return;
+      var day = today();
+      var list = proteinTags(day);
+      var at = list.indexOf(tag);
+      if (at >= 0) list.splice(at, 1);
+      else list.push(tag);
+      day.proteinTags = list;
+      saveState();
+      renderProtein();
+      renderSuggestion();
+      renderWeek();
+    });
 
     $('slotPicker').addEventListener('click', function (e) {
       var btn = e.target.closest('button');
