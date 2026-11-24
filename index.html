@@ -1147,7 +1147,7 @@
     var proteinOk = grams >= PROTEIN_TARGET_G * 0.9;
     var last = lastMeal(day);
     var lastFeel = last ? last.tummy : '';
-    var proteinAside = '두부·고기·생선·프로틴 중 하나만 곁들여도 좋아요.';
+    var proteinAside = '두부·고기·생선·프로틴처럼 단백질 반찬 하나만 곁들여도 좋아요.';
 
     if (!touched) {
       if (hour < 10) {
@@ -1201,6 +1201,22 @@
         main: '아직 기초대사까지 여유가 많아요.',
         aside: '밥 반 공기에 따뜻한 반찬 두 가지면 딱 좋아요.'
           + (proteinOk ? ' 다음 끼니에 과일 한 조각도 좋아요.' : ' ' + proteinAside)
+      };
+    }
+
+    if (fill < 0.5) {
+      if (hour >= 21) {
+        return {
+          main: '아직 기초대사까지 조금 남았어요.',
+          aside: '늦은 시간이라도 배가 고프면 죽이나 미역국밥 반 그릇부터 천천히 시작해 보세요. 밤에 굶고 자면 새벽에 더 당겨요.'
+        };
+      }
+      return {
+        main: '아직 기초대사까지 조금 남았어요.',
+        aside: (active
+          ? '많이 움직인 날이니 밥 반 공기에 따뜻한 국물, 단백질 반찬 하나까지 챙겨 보세요.'
+          : '밥 반 공기와 따뜻한 국물, 단백질 반찬 한 가지면 딱 좋아요.')
+          + (proteinOk ? '' : ' 두부나 생선 한 토막만 더하면 충분해요.')
       };
     }
 
